@@ -31,3 +31,5 @@ nbdist/
 
 .local/
 .env
+local.properties
+
