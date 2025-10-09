@@ -54,19 +54,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .logout().disable()
                 .csrf().disable()
-                .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .authorizeRequests().antMatchers("/**").permitAll();
 
-            http
-                .securityContext()
-                .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
-                .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
-                .and()
-                    .antMatcher("/")
-                        .authorizeRequests()
-                        .antMatchers(HttpMethod.GET, "/**").authenticated();
+            //<*!-- APPROOV PROTECTED SERVER - TOKEN BINDING CHECK --*>
+            // http
+            //     .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
+            //     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+            // http
+            //     .securityContext()
+            //     .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
+            //     .and()
+            //         .exceptionHandling()
+            //         .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
+            //     .and()
+            //         .antMatcher("/")
+            //             .authorizeRequests()
+            //             .antMatchers(HttpMethod.GET, "/**").authenticated();
         }
     }
 }

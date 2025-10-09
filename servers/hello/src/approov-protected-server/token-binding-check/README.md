@@ -1,6 +1,3 @@
-# Approov Token Binding Integration Example
-
-This Approov integration example is from where the code example for the [Approov token binding check quickstart](/docs/APPROOV_TOKEN_BINDING_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
 
 ## TOC - Table of Contents
 
@@ -9,13 +6,11 @@ This Approov integration example is from where the code example for the [Approov
 * [Requirements](#requirements)
 * [Try the Approov Integration Example](#try-the-approov-integration-example)
 
-
 ## Why?
 
 To lock down your API server to your mobile app. Please read the brief summary in the [Approov Overview](/OVERVIEW.md#why) at the root of this repo or visit our [website](https://approov.io/product) for more details.
 
 [TOC](#toc---table-of-contents)
-
 
 ## How it works?
 
@@ -33,7 +28,6 @@ For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-w
 
 [TOC](#toc---table-of-contents)
 
-
 ## Requirements
 
 To run this example you will need to have installed:
@@ -42,6 +36,74 @@ To run this example you will need to have installed:
 * [Java Spring](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html#getting-started.installing) - Version `2.6.4` of the Spring Framework plugin is being used. The code should work with prior versions but wasn't tested.
 
 [TOC](#toc---table-of-contents)
+
+
+# Unprotected Server Example
+
+The unprotected example is the base reference to build the [Approov protected servers](/servers/hello/src/approov-protected-server/). This a very basic Hello World server.
+
+
+# Approov Token Integration Example
+
+This Approov integration example is from where the code example for the [Approov token check quickstart](/docs/APPROOV_TOKEN_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
+
+
+# Approov Token Binding Integration Example
+
+This Approov integration example is from where the code example for the [Approov token binding check quickstart](/docs/APPROOV_TOKEN_BINDING_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
+
+
+# Try It
+# Unprotected Server Example
+
+
+First build the server with gradle. From the `./servers/hello/src/unprotected-server` folder execute:
+
+```bash
+./gradlew build
+```
+
+Now, you can run this example from the `./servers/hello/src/unprotected-server` folder with:
+
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+work not setuped secret can be use example
+```bash
+source .env && ./gradlew bootRun
+```
+
+Finally, you can test that it works with:
+
+```bash
+curl -iX GET 'http://localhost:8002'
+```
+
+The response will be:
+
+```json
+{"message":"Hello, World!"}
+```
+
+# Approov Token Integration Example
+
+# Approov Token Binding Integration Example
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Try the Approov Integration Example

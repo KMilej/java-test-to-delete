@@ -1,3 +1,4 @@
+
 package com.criticalblue.approov.jwt;
 
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
