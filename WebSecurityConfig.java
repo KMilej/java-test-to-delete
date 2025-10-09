@@ -38,9 +38,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Configuration
-    // @IMPORTANT Approov token check must be at Order 1. Any other type of
-    //            Authentication (User, API Key, etc.) for the request should go
-    //            after this one with @Order(2).
     @Order(1)
     public static class ApproovWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -50,31 +47,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http.cors();
 
             http
-// *** COMMENT THE LINE BELOW FOR APPROOV ***
-//              .authorizeRequests().antMatchers("/**").permitAll().and()
                 .httpBasic().disable()
                 .formLogin().disable()
                 .logout().disable()
                 .csrf().disable()
+                .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-// *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
-
-                 // @APPROOV The Approov Token check is triggered here.
-                 .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
-                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-             http
-                 .securityContext()
-                 // @APPROOV The Approov Token check is configured here.
-                 .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
-                 .and()
-                     .exceptionHandling()
-                     .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
-                 .and()
-                     // @APPROOV This matcher will require the Approov token for all API endpoints.
-                     .antMatcher("/")
-                         .authorizeRequests()
-                         .antMatchers(HttpMethod.GET, "/**").authenticated();
+            http
+                .securityContext()
+                .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
+                .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
+                .and()
+                    .antMatcher("/")
+                        .authorizeRequests()
+                        .antMatchers(HttpMethod.GET, "/**").authenticated();
         }
     }
 }

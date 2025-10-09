@@ -87,42 +87,59 @@ The response will be:
 ```json
 {"message":"Hello, World!"}
 ```
+<details>
+<summary>Show detailed HTTP response</summary>
+
+```http
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+```
+</details>
+
 
 # Approov Token Integration Example
 
-# Approov Token Binding Integration Example
+This Approov integration example is from where the code example for the [Approov token check quickstart](/docs/APPROOV_TOKEN_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
 
+## Why?
 
+To lock down your API server to your mobile app. Please read the brief summary in the [Approov Overview](/OVERVIEW.md#why) at the root of this repo or visit our [website](https://approov.io/product) for more details.
 
+## How it works?
 
+The Java Spring API server is very simple and only replies to the endpoint `/` with the message:
 
-
-
-
-
-
-
-
-
-
-
-## Try the Approov Integration Example
-
-First, you need to set the dummy secret in the `/servers/hello/src/approov-protected-server/token-binding-check/.env` file as explained [here](/TESTING.md#the-dummy-secret).
-
-Second, you need to build the server with gradle. From the `./servers/hello/src/approov-protected-server/token-binding-check` folder execute:
-
-```bash
-./gradlew build
+```json
+{"message": "Hello, World!"}
 ```
 
-Now, you can run this example from the `/servers/hello/src/approov-protected-server/token-binding-check` folder with:
+You can find the endpoint definition [here](./src/main/java/com/criticalblue/approov/jwt).
+
+Take a look at the [`verifyApproovToken()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) function to see the simple code for the check.
+
+For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-works) at the root of this repo.
+
+
+Go into WebSecutiyConfig.java and Command line 54 and uncommand line 62-75 in WebSecutiyConfig.java  [here](src/main/java/com/criticalblue/approov/jwt/WebSecurityConfig.java).
+
+Try it again:
 
 ```bash
-set -a
+set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
-set +a
+set +a  # stop exporting variables
 ```
+
 
 Next, you can test that it works with:
 
@@ -153,9 +170,88 @@ Connection: close
 
 The reason you got a `400` is because no Approoov token isn't provided in the headers of the request.
 
-Finally, you can test that the Approov integration example works as expected with this [Postman collection](/README.md#testing-with-postman) or with some more cURL requests [examples](/README.md#testing-with-curl).
+## Finally you can Try Approov Features
+ 
+Make sure you have the Approov CLI installed. If you don't have it yet, please follow the instructions [here](https://ext.approov.io/docs/latest/approov-installation/).
+<details><summary>The Approov CLI installation example via the brew</summary>
 
-[TOC](#toc---table-of-contents)
+```http
+brew update
+brew install approov
+```
+</details>
+
+Also you need Approov account if you dont have yet. You can sign up for a free trial [here](https://approov.io/signup/) . You will receive an email with the subject Approov Onboarding with activation information.
+
+## setting all settings
+
+getting the account secret key requires an admin role
+```bash
+approov secret -get base64 -plain
+```
+The Approov account secret is highly sensitive — it can be used to generate valid tokens and must never be exposed or stored in public code.
+
+Now, set the Approov account secret in the environment variable `APPROOV_BASE64_SECRET` inside the `.env` line 62-78, file [here](./.env).
+
+After setting the Approov account secret you can run the server again:
+
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+````
+
+
+Now, register the API domain for which Approov will issues tokens:
+
+```bash
+approov api -add api.example.com
+```
+
+You can check the registered APIs with:
+
+```bash
+approov api -list
+```
+
+## Approov Token protection
+
+Approov Token with Valid Signature and Expire Time (1 hour on trial account). The Approov token was signed with a secret only known by the Approov Cloud service and the GoLang server.
+
+Get an Approov token for the registered API domain with:
+
+```bash
+approov token -genExample api.example.com
+```
+
+Request:
+```bash
+curl -iX GET http://localhost:8002/ \
+  --header 'Approov-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjQ3MDg2ODMyMDUuODkxOTEyfQ.c8I4KNndbThAQ7zlgX4_QDtcxCrD9cff1elaCJe9p9U'
+```
+
+
+# Approov Token Binding Integration Example
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Try the Approov Integration Example
+
+First, you need to set the dummy secret in the `/servers/hello/src/approov-protected-server/token-binding-check/.env` file as explained [here](/TESTING.md#the-dummy-secret).
+
+Second, you need to build the server with gradle. From the `./servers/hello/src/approov-protected-server/token-binding-check` folder execute:
 
 
 ## Issues
