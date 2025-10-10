@@ -31,7 +31,7 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
 
     private Claims approovTokenPayloadClaims;
 
-    private final String tokenBindingHeader;
+    private String tokenBindingHeader;
 
     private String approovToken;
 
@@ -46,10 +46,17 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
      * @param approovToken       Extracted from the header `Approov-Token`.
      * @param tokenBindingHeader Extracted by default from the request header `Authorization`.
      */
+
+
     ApproovAuthentication(ApproovConfig approovConfig, String approovToken, String tokenBindingHeader) {
         this.approovConfig = approovConfig;
         this.approovToken = approovToken;
         this.tokenBindingHeader = tokenBindingHeader;
+    }
+
+    ApproovAuthentication(ApproovConfig approovConfig, String approovToken) {
+        this.approovConfig = approovConfig;
+        this.approovToken = approovToken;
     }
 
     @Override
@@ -83,7 +90,11 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
             throw new ApproovAuthenticationException(message, HttpStatus.UNAUTHORIZED.value());
         }
 
-        validTokenBinding = approovPayload.checkClaimMatchesFor(tokenBindingHeader, approovTokenPayloadClaims, approovConfig);
+
+        // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING TOKEN BINDING ***
+        //validTokenBinding = approovPayload.checkClaimMatchesFor(tokenBindingHeader, approovTokenPayloadClaims, approovConfig);
+
+
 
         isAuthenticated = true;
     }

@@ -233,7 +233,8 @@ curl -iX GET http://localhost:8002/ \
 
 # Approov Token Binding Integration Example
 
-
+[here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java).
+[here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java).
 
 
 
