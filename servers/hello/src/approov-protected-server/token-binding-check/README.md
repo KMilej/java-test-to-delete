@@ -129,7 +129,6 @@ Take a look at the [`verifyApproovToken()`](./src/main/java/com/criticalblue/app
 
 For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-works) at the root of this repo.
 
-
 Go into WebSecutiyConfig.java and Command line 54 and uncommand line 62-75 in WebSecutiyConfig.java  [here](src/main/java/com/criticalblue/approov/jwt/WebSecurityConfig.java).
 
 Try it again:
@@ -162,8 +161,7 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 11 Mar 2022 19:59:11 GMT
-Connection: close
+
 
 {}
 ```
@@ -227,32 +225,66 @@ approov token -genExample api.example.com
 Request:
 ```bash
 curl -iX GET http://localhost:8002/ \
-  --header 'Approov-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjQ3MDg2ODMyMDUuODkxOTEyfQ.c8I4KNndbThAQ7zlgX4_QDtcxCrD9cff1elaCJe9p9U'
+  --header 'Approov-Token: <Paste the Approov token here>'
 ```
+EXAMPLE:
+```html
+curl -iX GET http://localhost:8002/ \
+  --header 'Approov-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjQ3MDg2ODMyMDUuODkxOTEyfQ._ZdLOZmK4KXSIpVlhOpHBgboSHHTWer-X6oLqFIDQWI'
+```
+
+The response will be a `200` for request:
+
+```text
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+```
+The Approov Token Check verifies each request includes a valid, non-expired JWT (Approov token) signed with the server’s secret to confirm the app’s authenticity. If the token is missing, invalid, or expired, the request is rejected to prevent untrusted or tampered clients from accessing the backend.
 
 
 # Approov Token Binding Integration Example
 
-[here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java).
-[here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java).
+This Approov integration example is from where the code example for the [Approov token binding check quickstart](././././././docs/APPROOV_TOKEN_BINDING_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
+
+## How it works?
+
+The Java Spring API server is very simple and only replies to the endpoint `/` with the message:
+
+```json
+{"message": "Hello, World!"}
+```
+
+You can find the endpoint definition [here](./src/main/java/com/criticalblue/approov/jwt).
+
+Take a look at the [`verifyApproovToken()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) function to see the simple code for the check, and check out the [`verifyApproovTokenBinding()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovTokenBindingAuthentication.java) function to see how the Approov token binding is verified.
+
+For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-works) at the root of this repo.
 
 
+In `ApproovSecurityContextRepository.java`, uncomment lines 53–54 and comment out line 57 to enable the Approov security context, [here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java)
 
+then in ApproovAuthentication.java, uncomment line 95 to activate Approov token binding validation. [here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java)
 
+After code changing you need to run the server again:
 
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+````
+## How it works?
 
-
-
-
-
-
-
-
-## Try the Approov Integration Example
-
-First, you need to set the dummy secret in the `/servers/hello/src/approov-protected-server/token-binding-check/.env` file as explained [here](/TESTING.md#the-dummy-secret).
-
-Second, you need to build the server with gradle. From the `./servers/hello/src/approov-protected-server/token-binding-check` folder execute:
+Now, we need to bind a 
 
 
 ## Issues

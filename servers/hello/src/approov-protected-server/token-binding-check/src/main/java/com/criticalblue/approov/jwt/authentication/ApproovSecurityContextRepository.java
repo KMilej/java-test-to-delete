@@ -53,11 +53,13 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         //tokenBindingHeader = getTokenBindingHeader(request);
         //Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken, tokenBindingHeader);
 
-        // *** COMMENT THE TWO LINES BELOW FOR APPROOV TOKEN BINDING ***
+        // *** COMMENT THE LINE BELOW FOR APPROOV TOKEN BINDING ***
         Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken);
+
+
+
+
         context.setAuthentication(approovAuthentication);
-
-
 
         return context;
     }
