@@ -2,31 +2,46 @@
 ## TOC - Table of Contents
 
 * [Why?](#why)
-* [How it Works?](#how-it-works)
+* [How it Works?](#how-quickstart-works)
 * [Requirements](#requirements)
-* [Try the Approov Integration Example](#try-the-approov-integration-example)
+* [Try the Automated Script](#automated-script-to-run-the-examples)
 
-## Why?
 
-To lock down your API server to your mobile app. Please read the brief summary in the [Approov Overview](/OVERVIEW.md#why) at the root of this repo or visit our [website](https://approov.io/product) for more details.
 
-[TOC](#toc---table-of-contents)
 
-## How it works?
+## How quickstart works?
 
-The Java Spring API server is very simple and only replies to the endpoint `/` with the message:
+The Java Spring API server is intentionally simple. It exposes a single endpoint:
 
 ```json
 {"message": "Hello, World!"}
 ```
 
-You can find the endpoint definition [here](./src/main/java/com/criticalblue/approov/jwt).
+By default, this endpoint can be called by **any client**, as no security check is performed.  
+When **Approov protection** is added, the server verifies that each request truly comes from a **trusted and untampered mobile app**.
 
-Take a look at the [`verifyApproovToken()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) function to see the simple code for the check, and check out the [`verifyApproovTokenBinding()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovTokenBindingAuthentication.java) function to see how the Approov token binding is verified.
+### 🔍 Under the Hood
 
-For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-works) at the root of this repo.
+1. **Token Request:**  
+   The Approov SDK inside the mobile app securely communicates with the **Approov Cloud Service** to obtain a short-lived **Approov Token** (a signed JWT).
 
-[TOC](#toc---table-of-contents)
+2. **Token Attachment:**  
+   The app attaches this token to every API request using the `Approov-Token` HTTP header.
+
+3. **Server Validation:**  
+   The server verifies the token using the shared **Approov secret**, checking its:
+    - Signature authenticity
+    - Expiration (`exp` claim)
+    - Other claims if configured
+
+4. **Optional Token Binding:**  
+   For extra protection, the app may include an additional `Approov-Token-Binding` header.  
+   This binds the token to specific request data (for example, an access token or session ID).  
+   The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
+
+5. **Request Decision:**
+    -  If all checks pass → the request is trusted and processed.
+    -  If validation fails → the server responds with **`401 Unauthorized`**.
 
 ## Requirements
 
@@ -35,45 +50,67 @@ To run this example you will need to have installed:
 * [OpenJDK](https://openjdk.java.net/install/) - This server example uses version `11.0.3`. It should work with earlier or later versions but was not tested.
 * [Java Spring](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html#getting-started.installing) - Version `2.6.4` of the Spring Framework plugin is being used. The code should work with prior versions but wasn't tested.
 
-[TOC](#toc---table-of-contents)
+### ===========================================================
+### 1. Unprotected Endpoint (No Approov)
+### ===========================================================
 
+- The client sends a normal HTTPS request.
+- The server **does not verify** any Approov token or extra authentication header.
+- This means **any client** (even tampered or unauthorized) can call the API if they know the URL.
 
-# Unprotected Server Example
+### ===========================================================
+### 2. Approov Token Integration check
+### ===========================================================
 
-The unprotected example is the base reference to build the [Approov protected servers](/servers/hello/src/approov-protected-server/). This a very basic Hello World server.
+- The client includes an **`Approov-Token`** (a short-lived JWT) in each API request header.
+- The server verifies this token using the **shared Approov secret** and checks:
+    -  Token signature (authenticity)
+    -  Expiration (`exp` claim)
+    -  Audience or payload claims if configured
+- If the token is valid → request is trusted.
+- If invalid → server returns **`401 Unauthorized`**.
+- **Use case:** secure endpoints ensuring the request comes from an **unmodified Approov-protected app**.
 
+### ===========================================================
+### 3. Approov Token Binding Integration
+### ===========================================================
 
-# Approov Token Integration Example
+- The client sends both:
+    - **`Approov-Token`**
+    - **`Approov-Token-Binding`** header containing a hash of specific request data (e.g., access token or session ID).
+- The server verifies the token **and** ensures that the bound value matches what the app used.
+- Prevents token replay — the Approov token **cannot be reused or stolen** for another session.
+- **Use case:** strongest protection for **authenticated API calls** tied to a specific user or device.
 
-This Approov integration example is from where the code example for the [Approov token check quickstart](/docs/APPROOV_TOKEN_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
+```json
+"Try It Out Yourself, follow the steps below to run automatically or manually. "
+```
 
+## Automated script to run the examples:
 
-# Approov Token Binding Integration Example
+```bash
+bash approov_script.sh
+```
 
-This Approov integration example is from where the code example for the [Approov token binding check quickstart](/docs/APPROOV_TOKEN_BINDING_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
+## Manual version, for more details, please read below.
+## 🧩 Unprotected Server Example
 
+This example runs the server **without any Approov protection** — useful for verifying that your setup works before enabling token checks.
 
-# Try It
-# Unprotected Server Example
+---
 
+### Build the Server
 
-First build the server with gradle. From the `./servers/hello/src/unprotected-server` folder execute:
+From the `./servers/hello/src/approov-server` directory, run:
 
 ```bash
 ./gradlew build
 ```
 
-Now, you can run this example from the `./servers/hello/src/unprotected-server` folder with:
-
 ```bash
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
 set +a  # stop exporting variables
-```
-
-work not setuped secret can be use example
-```bash
-source .env && ./gradlew bootRun
 ```
 
 Finally, you can test that it works with:
@@ -109,44 +146,33 @@ Transfer-Encoding: chunked
 
 # Approov Token Integration Example
 
-This Approov integration example is from where the code example for the [Approov token check quickstart](/docs/APPROOV_TOKEN_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
+Approov protection adds a verification step to ensure that every API request comes from a **trusted and authorized client** — not from tampered or unknown sources.
 
-## Why?
+> 💡 **To enable Approov protection**, open `WebSecurityConfig.java`[here](src/main/java/com/criticalblue/approov/jwt/WebSecurityConfig.java).
 
-To lock down your API server to your mobile app. Please read the brief summary in the [Approov Overview](/OVERVIEW.md#why) at the root of this repo or visit our [website](https://approov.io/product) for more details.
+> - Comment out **line 54**
+> - Uncomment **lines 62–75**
+> 
+> > This activates the Approov token verification for incoming API requests.
 
-## How it works?
 
-The Java Spring API server is very simple and only replies to the endpoint `/` with the message:
-
-```json
-{"message": "Hello, World!"}
-```
-
-You can find the endpoint definition [here](./src/main/java/com/criticalblue/approov/jwt).
-
-Take a look at the [`verifyApproovToken()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) function to see the simple code for the check.
-
-For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-works) at the root of this repo.
-
-Go into WebSecutiyConfig.java and Command line 54 and uncommand line 62-75 in WebSecutiyConfig.java  [here](src/main/java/com/criticalblue/approov/jwt/WebSecurityConfig.java).
-
-Try it again:
+### Try it again:
 
 ```bash
+lsof -ti:8002 | xargs kill -9 2>/dev/null || true
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
 set +a  # stop exporting variables
 ```
 
-
 Next, you can test that it works with:
 
-```text
+```bash
 curl -iX GET 'http://localhost:8002'
 ```
 
-The response will be a `400` bad request:
+The response will be a `400` bad request beacuse code throws `ApproovAuthenticationException` it looks for the Approov token in the header of the request.
+
 
 ```text
 HTTP/1.1 400
@@ -162,15 +188,11 @@ X-Frame-Options: DENY
 Content-Type: application/json
 Transfer-Encoding: chunked
 
-
-{}
 ```
 
-The reason you got a `400` is because no Approoov token isn't provided in the headers of the request.
-
-## Finally you can Try Approov Features
+## Adding Approov Features
  
-Make sure you have the Approov CLI installed. If you don't have it yet, please follow the instructions [here](https://ext.approov.io/docs/latest/approov-installation/).
+`Make sure you have the Approov CLI installed. If you don't have it yet, please follow the instructions` [here](https://ext.approov.io/docs/latest/approov-installation/).
 <details><summary>The Approov CLI installation example via the brew</summary>
 
 ```http
@@ -179,7 +201,7 @@ brew install approov
 ```
 </details>
 
-Also you need Approov account if you dont have yet. You can sign up for a free trial [here](https://approov.io/signup/) . You will receive an email with the subject Approov Onboarding with activation information.
+`Also you need Approov account if you dont have yet. You can sign up for a free trial` [here](https://approov.io/signup/) `. You will receive an email with the subject Approov Onboarding with activation information.`
 
 ## setting all settings
 
@@ -189,16 +211,16 @@ approov secret -get base64 -plain
 ```
 The Approov account secret is highly sensitive — it can be used to generate valid tokens and must never be exposed or stored in public code.
 
-Now, set the Approov account secret in the environment variable `APPROOV_BASE64_SECRET` inside the `.env` line 62-78, file [here](./.env).
+Now, set the Approov account secret in the environment variable `APPROOV_BASE64_SECRET` inside the `.env` line 18, file [here](./.env).
 
 After setting the Approov account secret you can run the server again:
 
 ```bash
+lsof -ti:8002 | xargs kill -9 2>/dev/null || true
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
 set +a  # stop exporting variables
-````
-
+```
 
 Now, register the API domain for which Approov will issues tokens:
 
@@ -249,26 +271,14 @@ X-Frame-Options: DENY
 Content-Type: application/json
 Transfer-Encoding: chunked
 ```
-The Approov Token Check verifies each request includes a valid, non-expired JWT (Approov token) signed with the server’s secret to confirm the app’s authenticity. If the token is missing, invalid, or expired, the request is rejected to prevent untrusted or tampered clients from accessing the backend.
+### > The Approov Token Check verifies each request includes a valid, non-expired JWT (Approov token) signed with the server’s secret to confirm the app’s authenticity. If the token is missing, invalid, or expired, the request is rejected to prevent untrusted or tampered clients from accessing the backend.
 
 
 # Approov Token Binding Integration Example
 
 This Approov integration example is from where the code example for the [Approov token binding check quickstart](././././././docs/APPROOV_TOKEN_BINDING_QUICKSTART.md) is extracted, and you can use it as a playground to better understand how simple and easy it is to implement [Approov](https://approov.io) in a Java Spring API server.
 
-## How it works?
 
-The Java Spring API server is very simple and only replies to the endpoint `/` with the message:
-
-```json
-{"message": "Hello, World!"}
-```
-
-You can find the endpoint definition [here](./src/main/java/com/criticalblue/approov/jwt).
-
-Take a look at the [`verifyApproovToken()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) function to see the simple code for the check, and check out the [`verifyApproovTokenBinding()`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovTokenBindingAuthentication.java) function to see how the Approov token binding is verified.
-
-For more background on Approov, see the [Approov Overview](/OVERVIEW.md#how-it-works) at the root of this repo.
 
 
 In `ApproovSecurityContextRepository.java`, uncomment lines 53–54 and comment out line 57 to enable the Approov security context, [here](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java)
@@ -282,9 +292,6 @@ set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
 set +a  # stop exporting variables
 ````
-## How it works?
-
-Now, we need to bind a 
 
 
 ## Issues
@@ -298,6 +305,384 @@ If you find any issue while following our instructions then just report it [here
 
 If you wish to explore the Approov solution in more depth, then why not try one of the following links as a jumping off point:
 
+
+## TOC - Table of Contents
+
+* [Why?](#why)
+* [How it Works?](#how-quickstart-works)
+* [Requirements](#requirements)
+* [Try the Automated Script](#automated-script-to-run-the-examples)
+
+
+
+
+## How quickstart works?
+
+The Java Spring API server is intentionally simple. It exposes a single endpoint:
+
+```json
+{"message": "Hello, World!"}
+```
+
+By default, this endpoint can be called by **any client**, as no security check is performed.  
+When **Approov protection** is added, the server verifies that each request truly comes from a **trusted and untampered mobile app**.
+
+### 🔍 Under the Hood
+
+1. **Token Request:**  
+   The Approov SDK inside the mobile app securely communicates with the **Approov Cloud Service** to obtain a short-lived **Approov Token** (a signed JWT).
+
+2. **Token Attachment:**  
+   The app attaches this token to every API request using the `Approov-Token` HTTP header.
+
+3. **Server Validation:**  
+   The server verifies the token using the shared **Approov secret**, checking its:
+    - Signature authenticity
+    - Expiration (`exp` claim)
+    - Other claims if configured
+
+4. **Optional Token Binding:**  
+   For extra protection, the app may include an additional `Approov-Token-Binding` header.  
+   This binds the token to specific request data (for example, an access token or session ID).  
+   The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
+
+5. **Request Decision:**
+    -  If all checks pass → the request is trusted and processed.
+    -  If validation fails → the server responds with **`401 Unauthorized`**.
+
+## Requirements
+
+To run this example you will need to have installed:
+
+* [OpenJDK](https://openjdk.java.net/install/) - This server example uses version `11.0.3`. It should work with earlier or later versions but was not tested.
+* [Java Spring](https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started.html#getting-started.installing) - Version `2.6.4` of the Spring Framework plugin is being used. The code should work with prior versions but wasn't tested.
+
+### ===========================================================
+### 1. Unprotected Endpoint (No Approov)
+### ===========================================================
+
+- The client sends a normal HTTPS request.
+- The server **does not verify** any Approov token or extra authentication header.
+- This means **any client** (even tampered or unauthorized) can call the API if they know the URL.
+
+### ===========================================================
+### 2. Approov Token Integration check
+### ===========================================================
+
+- The client includes an **`Approov-Token`** (a short-lived JWT) in each API request header.
+- The server verifies this token using the **shared Approov secret** and checks:
+    -  Token signature (authenticity)
+    -  Expiration (`exp` claim)
+    -  Audience or payload claims if configured
+- If the token is valid → request is trusted.
+- If invalid → server returns **`401 Unauthorized`**.
+- **Use case:** secure endpoints ensuring the request comes from an **unmodified Approov-protected app**.
+
+### ===========================================================
+### 3. Approov Token Binding Integration
+### ===========================================================
+
+- The client sends both:
+    - **`Approov-Token`**
+    - **`Approov-Token-Binding`** header containing a hash of specific request data (e.g., access token or session ID).
+- The server verifies the token **and** ensures that the bound value matches what the app used.
+- Prevents token replay — the Approov token **cannot be reused or stolen** for another session.
+- **Use case:** strongest protection for **authenticated API calls** tied to a specific user or device.
+
+```json
+"Try It Out Yourself, follow the steps below to run automatically or manually. "
+```
+
+## Automated script to run the examples:
+
+```bash
+bash approov_script.sh
+```
+
+## Manual version, for more details, please read below.
+## 🧩 Unprotected Server Example
+
+This example runs the server **without any Approov protection** — useful for verifying that your setup works before enabling token checks.
+
+---
+
+### Build the Server
+
+From the `./servers/hello/src/approov-server` directory, run:
+
+```bash
+./gradlew build
+```
+
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+Finally, you can test that it works with:
+
+```bash
+curl -iX GET 'http://localhost:8002'
+```
+
+The response will be:
+
+```json
+{"message":"Hello, World!"}
+```
+<details>
+<summary>Show detailed HTTP response</summary>
+
+```http
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+```
+</details>
+
+
+# Approov Token Integration Example
+
+Approov protection adds a verification step to ensure that every API request comes from a **trusted and authorized client** — not from tampered or unknown sources.
+
+> 💡 **To enable Approov protection**, open `WebSecurityConfig.java`[here](src/main/java/com/criticalblue/approov/jwt/WebSecurityConfig.java).
+
+> - Comment out **line 54**
+> - Uncomment **lines 62–75**
+>
+> > This activates the Approov token verification for incoming API requests.
+
+
+### Try it again:
+
+```bash
+lsof -ti:8002 | xargs kill -9 2>/dev/null || true
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+Next, you can test that it works with:
+
+```bash
+curl -iX GET 'http://localhost:8002'
+```
+
+The response will be a `400` bad request beacuse code throws `ApproovAuthenticationException` it looks for the Approov token in the header of the request.
+
+
+```text
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+
+```
+
+## Adding Approov Features
+
+`Make sure you have the Approov CLI installed. If you don't have it yet, please follow the instructions` [here](https://ext.approov.io/docs/latest/approov-installation/).
+<details><summary>The Approov CLI installation example via the brew</summary>
+
+```http
+brew update
+brew install approov
+```
+</details>
+
+`Also you need Approov account if you dont have yet. You can sign up for a free trial` [here](https://approov.io/signup/) `. You will receive an email with the subject Approov Onboarding with activation information.`
+
+## setting all settings
+
+getting the account secret key requires an admin role
+```bash
+approov secret -get base64 -plain
+```
+The Approov account secret is highly sensitive — it can be used to generate valid tokens and must never be exposed or stored in public code.
+
+### Now, set the Approov account secret in the environment variable `APPROOV_BASE64_SECRET` inside the `.env` line 18, file [here](./.env).
+
+After setting the Approov account secret you can run the server again:
+
+```bash
+lsof -ti:8002 | xargs kill -9 2>/dev/null || true
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+Now, register the API domain for which Approov will issues tokens:
+
+```bash
+approov api -add api.example.com
+```
+
+You can check the registered APIs with:
+
+```bash
+approov api -list
+```
+
+## Approov Token protection
+
+Approov Token with Valid Signature and Expire Time (1 hour on trial account). The Approov token was signed with a secret only known by the Approov Cloud service and the GoLang server.
+
+Get an Approov token for the registered API domain with:
+
+```bash
+approov token -genExample api.example.com
+```
+
+Request:
+```bash
+curl -iX GET http://localhost:8002/ \
+  --header 'Approov-Token: <Paste the Approov token here>'
+```
+EXAMPLE:
+```html
+curl -iX GET http://localhost:8002/ \
+  --header 'Approov-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjQ3MDg2ODMyMDUuODkxOTEyfQ._ZdLOZmK4KXSIpVlhOpHBgboSHHTWer-X6oLqFIDQWI'
+```
+
+The response will be a `200` for request:
+
+```text
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+```
+### > The Approov Token Check verifies each request includes a valid, non-expired JWT (Approov token) signed with the server’s secret to confirm the app’s authenticity. If the token is missing, invalid, or expired, the request is rejected to prevent untrusted or tampered clients from accessing the backend.
+
+
+# Approov Token Binding Integration Example
+
+
+When **token binding** is enabled, each request must prove that the Approov token truly belongs to that specific client session.
+
+- The client sends both:
+    - **`Approov-Token`** — a signed JWT issued by Approov
+    - **`Approov-Token-Binding`** — a hash of sensitive request data (e.g., an access token or session ID)
+
+- The server verifies:
+    -  That the binding hash matches the claim inside the Approov token
+
+If both checks succeed, the request is trusted.  
+If not, the server rejects it to prevent **token replay or misuse**.
+
+Core implementation:
+- [`ApproovAuthentication.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) — verifies token and binding
+- [`ApproovSecurityContextRepository.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java) — applies security context for the validation
+
+> 💡 **Step 1:**  
+> In [`ApproovSecurityContextRepository.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java):
+> - **Uncomment lines 53–54**
+> - **Comment out line 57**
+>
+> 💡 **Step 2:**  
+> In [`ApproovAuthentication.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java):
+> - **Uncomment line 95** to enable Approov token binding validation.
+
+
+After code changing you need to run the server again:
+
+```bash
+lsof -ti:8002 | xargs kill -9 2>/dev/null || true
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+````
+
+if you use the same command as in the token check example, you will receive a 400 Bad Request response because the server now expects an additional Approov-Token-Binding header in the request.
+
+```bash
+curl -iX GET http://localhost:8002/ \
+  --header 'Approov-Token: <Paste the Approov token here>'
+```
+
+we need to add the Approov-Token-Binding header to the request, for example:
+
+```bash
+approov token -setDataHashInToken chosen_header_name -genExample api.example.com
+```
+
+we get token with the hash of the string "chosen_header_name" in the claim `pay`:
+we can check both the token and the hash with by:
+
+```bash
+curl -iX GET 'http://localhost:8002/' \
+  --header 'Approov-Token: <Paste the Approov token here>' \
+  --header 'Authorization: chosen_header_name'
+```
+
+<details>
+<summary>Example of the Approov token with the hash of the string <code>"chosen_header_name"</code> in the claim <code>pay</code></summary>
+
+```html
+curl -iX GET 'http://localhost:8002/' \
+  --header 'Approov-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJleHAiOjE3NjAwODc0NjMsImlwIjoiMS4yLjMuNCIsImRpZCI6IkV4YW1wbGVBcHByb292VG9rZW5ESUQ9PSIsInBheSI6Ikh6UlFQMlcwbzFXcFR1Vk5xT05GUVFCOHhtN0ZTTVliamErK29ob2FCNGM9In0.qYBHm1byrJt2weP1BrwkYrsZrtsEuvNI2-JNBRe6Y5w' \
+  --header 'Authorization: chosen_header_name'
+  ```
+</details>
+
+The response will be a `200` for request:
+
+```text
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+```
+
+
+
+
+## Issues
+
+If you find any issue while following our instructions then just report it [here](https://github.com/approov/quickstart-java-spring-token-check/issues), with the steps to reproduce it, and we will sort it out and/or guide you to the correct path.
+
+[TOC](#toc---table-of-contents)
+
+
+## Useful Links
+
+If you wish to explore the Approov solution in more depth, then why not try one of the following links as a jumping off point:
+
+* [Approov token binding check quickstart](/docs/APPROOV_TOKEN_BINDING_QUICKSTART.md)
+* [Approov token check quickstart](/docs/APPROOV_TOKEN_QUICKSTART.md)
 * [Approov Free Trial](https://approov.io/signup)(no credit card needed)
 * [Approov Get Started](https://approov.io/product/demo)
 * [Approov QuickStarts](https://approov.io/docs/latest/approov-integration-examples/)
