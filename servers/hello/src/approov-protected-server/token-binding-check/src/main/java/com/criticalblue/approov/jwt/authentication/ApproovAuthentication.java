@@ -92,7 +92,7 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
 
 
         // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING TOKEN BINDING ***
-        validTokenBinding = approovPayload.checkClaimMatchesFor(tokenBindingHeader, approovTokenPayloadClaims, approovConfig);
+//        validTokenBinding = approovPayload.checkClaimMatchesFor(tokenBindingHeader, approovTokenPayloadClaims, approovConfig);
 
 
 
