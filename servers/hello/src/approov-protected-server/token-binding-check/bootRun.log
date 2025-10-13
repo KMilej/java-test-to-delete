@@ -1,0 +1,22 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :bootRunMainClassName UP-TO-DATE
+
+> Task :bootRun
+17:21:18.345 [Thread-0] DEBUG org.springframework.boot.devtools.restart.classloader.RestartClassLoader - Created RestartClassLoader org.springframework.boot.devtools.restart.classloader.RestartClassLoader@74d949c0
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.6.4)
+
+2025-10-13 17:21:18.461  INFO 2287 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Starting Application using Java 21.0.8 on Kamils-Mac-mini.local with PID 2287 (/Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check/build/classes/java/main started by km in /Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check)
+2025-10-13 17:21:18.461  INFO 2287 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : No active profile set, falling back to 1 default profile: "default"
+2025-10-13 17:21:19.325  INFO 2287 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Started Application in 0.974 seconds (JVM running for 1.116)
+2025-10-13 17:21:29.921 ERROR 2287 --- [nio-8002-exec-1] .c.a.j.a.ApproovAuthenticationEntryPoint : 401 UNAUTHORIZED | class com.criticalblue.approov.jwt.authentication.ApproovAuthenticationException | Request with an invalid Approov token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted. | Stacktrace origin: com.criticalblue.approov.jwt.authentication.ApproovAuthentication.verifyApproovToken(ApproovAuthentication.java:90)
+2025-10-13 17:21:45.189  INFO 2287 --- [nio-8002-exec-2] c.c.a.j.a.ApproovAuthentication          : Request approved with a valid Approov token.
+2025-10-13 17:21:45.193  INFO 2287 --- [nio-8002-exec-2] c.c.approov.jwt.ApiController            : Serving request for endpoint '/', that is protect by an Approov Token.
