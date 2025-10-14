@@ -52,29 +52,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http
 // *** COMMENT THE LINE BELOW FOR APPROOV ***
 //              .authorizeRequests().antMatchers("/**").permitAll().and()
-                .httpBasic().disable()
-                .formLogin().disable()
-                .logout().disable()
-                .csrf().disable()
+                    .httpBasic().disable()
+                    .formLogin().disable()
+                    .logout().disable()
+                    .csrf().disable()
 
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
 
-                 // @APPROOV The Approov Token check is triggered here.
-                 .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
-                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    // @APPROOV The Approov Token check is triggered here.
+                    .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-             http
-                 .securityContext()
-                 // @APPROOV The Approov Token check is configured here.
-                 .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
-                 .and()
-                     .exceptionHandling()
-                     .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
-                 .and()
-                     // @APPROOV This matcher will require the Approov token for all API endpoints.
-                     .antMatcher("/")
-                         .authorizeRequests()
-                         .antMatchers(HttpMethod.GET, "/**").authenticated();
+            http
+                    .securityContext()
+                    // @APPROOV The Approov Token check is configured here.
+                    .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
+                    .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
+                    .and()
+                    // @APPROOV This matcher will require the Approov token for all API endpoints.
+//                     .antMatcher("/")
+//                         .authorizeRequests()
+//                         .antMatchers(HttpMethod.GET, "/**").authenticated();authenticated
+                    .authorizeRequests()
+                    // public root
+                    .antMatchers("/").permitAll()
+                    // require Approov token (and binding/signing enforced by your Approov components/config)
+                    .antMatchers("/token-check").authenticated()
+                    .antMatchers("/token-binding-check").authenticated()
+                    .antMatchers("/message-signing-check").authenticated()
+                    // anything else is denied (optional but good practice)
+                    .anyRequest().denyAll();
         }
     }
 }

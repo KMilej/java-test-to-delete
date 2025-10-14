@@ -35,7 +35,7 @@ When **Approov protection** is added, the server verifies that each request trul
     - Expiration (`exp` claim)
     - Other claims if configured
 
-4. **Optional Token Binding:**  
+4. **(Optional) Token Binding:**  
    For extra protection, the app may include an additional `Approov-Token-Binding` header.  
    This binds the token to specific request data (for example, an access token or session ID).  
    The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
@@ -153,7 +153,7 @@ Approov protection adds a verification step to ensure that every API request com
 
 > - Comment out **line 54**
 > - Uncomment **lines 62–75**
-> 
+>
 > > This activates the Approov token verification for incoming API requests.
 
 
@@ -192,7 +192,7 @@ Transfer-Encoding: chunked
 ```
 [Back to Table of Contents](#toc---table-of-contents)
 ## Adding Approov Features
- 
+
 `Make sure you have the Approov CLI installed. If you don't have it yet, please follow the instructions` [here](https://ext.approov.io/docs/latest/approov-installation/).
 <details><summary>The Approov CLI installation example via the brew</summary>
 
@@ -204,7 +204,7 @@ brew install approov
 
 `Also you need Approov account if you dont have yet. You can sign up for a free trial` [here](https://approov.io/signup/) `. You will receive an email with the subject Approov Onboarding with activation information.`
 
-## setting all settings
+## Configuring the Application
 
 getting the account secret key requires an admin role
 ```bash
@@ -253,7 +253,7 @@ curl -iX GET http://localhost:8002/ \
 EXAMPLE:
 ```html
 curl -iX GET http://localhost:8002/ \
-  --header 'Approov-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjQ3MDg2ODMyMDUuODkxOTEyfQ._ZdLOZmK4KXSIpVlhOpHBgboSHHTWer-X6oLqFIDQWI'
+--header 'Approov-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjQ3MDg2ODMyMDUuODkxOTEyfQ._ZdLOZmK4KXSIpVlhOpHBgboSHHTWer-X6oLqFIDQWI'
 ```
 
 The response will be a `200` for request:
@@ -340,8 +340,8 @@ curl -iX GET 'http://localhost:8002/' \
 
 ```html
 curl -iX GET 'http://localhost:8002/' \
-  --header 'Approov-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJleHAiOjE3NjAwODc0NjMsImlwIjoiMS4yLjMuNCIsImRpZCI6IkV4YW1wbGVBcHByb292VG9rZW5ESUQ9PSIsInBheSI6Ikh6UlFQMlcwbzFXcFR1Vk5xT05GUVFCOHhtN0ZTTVliamErK29ob2FCNGM9In0.qYBHm1byrJt2weP1BrwkYrsZrtsEuvNI2-JNBRe6Y5w' \
-  --header 'Authorization: chosen_header_name'
+--header 'Approov-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJleHAiOjE3NjAwODc0NjMsImlwIjoiMS4yLjMuNCIsImRpZCI6IkV4YW1wbGVBcHByb292VG9rZW5ESUQ9PSIsInBheSI6Ikh6UlFQMlcwbzFXcFR1Vk5xT05GUVFCOHhtN0ZTTVliamErK29ob2FCNGM9In0.qYBHm1byrJt2weP1BrwkYrsZrtsEuvNI2-JNBRe6Y5w' \
+--header 'Authorization: chosen_header_name'
   ```
 </details>
 
@@ -385,4 +385,3 @@ If you wish to explore the Approov solution in more depth, then why not try one 
 * [Contact Us](https://approov.io/contact)
 
 [Back to Table of Contents](#toc---table-of-contents)
-
