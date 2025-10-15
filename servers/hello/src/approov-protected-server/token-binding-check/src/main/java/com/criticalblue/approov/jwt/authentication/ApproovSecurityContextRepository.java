@@ -3,16 +3,20 @@ package com.criticalblue.approov.jwt.authentication;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.criticalblue.approov.jwt.ApiController;
+import com.criticalblue.approov.jwt.WebSecurityConfig;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 
+import static com.criticalblue.approov.jwt.ApiController.isTokenBindingEnebled;
+
 /**
  * Used to setup the Approov Authentication Context when configuring the Spring framework security.
  *
- * @see com.criticalblue.approov.jwt.WebSecurityConfig
+ * @see WebSecurityConfig
  */
 public class ApproovSecurityContextRepository implements SecurityContextRepository {
 
@@ -50,18 +54,32 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
 
 
         // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV USING TOKEN BINDING ***
-//        tokenBindingHeader = getTokenBindingHeader(request);
-//        Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken, tokenBindingHeader);
+
+//         tokenBindingHeader = getTokenBindingHeader(request);
+//         Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken, tokenBindingHeader);
 
         // *** COMMENT THE LINE BELOW FOR APPROOV TOKEN BINDING ***
-        Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken);
+//        Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken);
 
 
 
 
-        context.setAuthentication(approovAuthentication);
+        if (isTokenBindingEnebled == true) {
+            tokenBindingHeader = getTokenBindingHeader(request);
+            Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken, tokenBindingHeader);
+            context.setAuthentication(approovAuthentication);
+            return context;
+        } else {
+            Authentication approovAuthentication = new ApproovAuthentication(approovConfig, approovToken);
+            context.setAuthentication(approovAuthentication);
+            return context;
+        }
 
-        return context;
+
+
+       // context.setAuthentication(approovAuthentication);
+
+      //  return context;
     }
 
     private String getTokenBindingHeader(HttpServletRequest request) {

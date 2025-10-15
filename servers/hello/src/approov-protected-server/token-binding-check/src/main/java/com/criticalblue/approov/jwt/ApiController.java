@@ -1,8 +1,10 @@
 
 package com.criticalblue.approov.jwt;
 
+import com.criticalblue.approov.jwt.authentication.ApproovConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -14,6 +16,9 @@ import java.util.Map;
 public class ApiController {
 
     private static Logger logger = LoggerFactory.getLogger(ApiController.class);
+
+    public static boolean isTokenBindingEnebled;
+
 
     @GetMapping("/")
     public Map<String, Object> helloV1() {
@@ -35,11 +40,14 @@ public class ApiController {
     @GetMapping("/token-binding-check")
     public Map<String, Object> tokenBindingCheck(
             @RequestHeader(value = "Authorization", required = true) String authorizationHeader) {
-        logger.info("Serving request for '/token-binding-check' (Approov Token Binding check).");
+        logger.info("Serving request for '/token-binding-check' (Approov Token check).");
+        isTokenBindingEnebled = true;
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "This is the token-binding-check endpoint.");
-        response.put("hint", "Server-side filter verifies the Approov token's binding to the chosen header value.");
-        response.put("authorizationHeaderPresent", authorizationHeader != null && !authorizationHeader.isEmpty());
+        response.put("message", "This is the token-check endpoint.");
+        response.put("detail", "Access permitted only when Approov Token is valid (handled by security filter).");
+        System.out.println("isTokenBindingEnebled: " + isTokenBindingEnebled);
+        response.put("isTokenBindingEnebled", isTokenBindingEnebled);
+
         return response;
     }
 
@@ -48,6 +56,7 @@ public class ApiController {
             @RequestHeader(value = "Authorization", required = true) String authorizationHeader,
             @RequestHeader(value = "Content-Digest", required = true) String customHeader) {
         logger.info("Serving request for '/token-binding-check-with-two-values' (Approov Token Binding check with two values).");
+
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "This is the token-binding-check-with-two-values endpoint.");
         response.put("hint", "Server-side filter verifies the Approov token's binding to the chosen header values.");

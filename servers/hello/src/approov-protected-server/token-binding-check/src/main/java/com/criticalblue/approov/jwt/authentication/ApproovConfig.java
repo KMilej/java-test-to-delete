@@ -15,6 +15,7 @@ final public class ApproovConfig {
 
     private final String approovTokenBindingHeaderName;
 
+
     /**
      * Constructs the Approov Config singleton with values retrieved from the .env file in the root of the project.
      */
