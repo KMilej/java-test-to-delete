@@ -51,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             http
 // *** COMMENT THE LINE BELOW FOR APPROOV ***
-//              .authorizeRequests().antMatchers("/**").permitAll().and()
+             //.authorizeRequests().antMatchers("/**").permitAll().and()
                     .httpBasic().disable()
                     .formLogin().disable()
                     .logout().disable()
@@ -82,6 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/token-check").authenticated()
                     .antMatchers("/token-binding-check").authenticated()
                     .antMatchers("/message-signing-check").authenticated()
+                    .antMatchers("/token-binding-check-with-two-values").authenticated()
                     // anything else is denied (optional but good practice)
                     .anyRequest().denyAll();
         }

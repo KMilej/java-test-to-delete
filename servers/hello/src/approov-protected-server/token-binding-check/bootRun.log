@@ -4,7 +4,7 @@
 > Task :bootRunMainClassName UP-TO-DATE
 
 > Task :bootRun
-17:21:18.345 [Thread-0] DEBUG org.springframework.boot.devtools.restart.classloader.RestartClassLoader - Created RestartClassLoader org.springframework.boot.devtools.restart.classloader.RestartClassLoader@74d949c0
+09:01:59.081 [Thread-0] DEBUG org.springframework.boot.devtools.restart.classloader.RestartClassLoader - Created RestartClassLoader org.springframework.boot.devtools.restart.classloader.RestartClassLoader@798dab44
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -14,9 +14,53 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v2.6.4)
 
-2025-10-13 17:21:18.461  INFO 2287 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Starting Application using Java 21.0.8 on Kamils-Mac-mini.local with PID 2287 (/Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check/build/classes/java/main started by km in /Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check)
-2025-10-13 17:21:18.461  INFO 2287 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : No active profile set, falling back to 1 default profile: "default"
-2025-10-13 17:21:19.325  INFO 2287 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Started Application in 0.974 seconds (JVM running for 1.116)
-2025-10-13 17:21:29.921 ERROR 2287 --- [nio-8002-exec-1] .c.a.j.a.ApproovAuthenticationEntryPoint : 401 UNAUTHORIZED | class com.criticalblue.approov.jwt.authentication.ApproovAuthenticationException | Request with an invalid Approov token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted. | Stacktrace origin: com.criticalblue.approov.jwt.authentication.ApproovAuthentication.verifyApproovToken(ApproovAuthentication.java:90)
-2025-10-13 17:21:45.189  INFO 2287 --- [nio-8002-exec-2] c.c.a.j.a.ApproovAuthentication          : Request approved with a valid Approov token.
-2025-10-13 17:21:45.193  INFO 2287 --- [nio-8002-exec-2] c.c.approov.jwt.ApiController            : Serving request for endpoint '/', that is protect by an Approov Token.
+2025-10-15 09:01:59.196  INFO 71837 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Starting Application using Java 21.0.8 on Kamils-Mac-mini.local with PID 71837 (/Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check/build/classes/java/main started by km in /Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check)
+2025-10-15 09:01:59.196  INFO 71837 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : No active profile set, falling back to 1 default profile: "default"
+2025-10-15 09:02:00.056  INFO 71837 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Started Application in 0.969 seconds (JVM running for 1.113)
+2025-10-15 09:02:10.592 ERROR 71837 --- [nio-8002-exec-1] .c.a.j.a.ApproovAuthenticationEntryPoint : 401 UNAUTHORIZED | class com.criticalblue.approov.jwt.authentication.ApproovAuthenticationException | Request with an invalid Approov token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted. | Stacktrace origin: com.criticalblue.approov.jwt.authentication.ApproovAuthentication.verifyApproovToken(ApproovAuthentication.java:90)
+2025-10-15 09:02:25.878  INFO 71837 --- [nio-8002-exec-3] c.c.a.j.a.ApproovAuthentication          : Request approved with a valid Approov token.
+2025-10-15 09:02:25.882  INFO 71837 --- [nio-8002-exec-3] c.c.approov.jwt.ApiController            : Serving request for endpoint '/', that is protect by an Approov Token.
+2025-10-15 09:03:36.657  INFO 71837 --- [nio-8002-exec-5] c.c.a.j.a.ApproovAuthentication          : Request approved with a valid Approov token.
+2025-10-15 09:03:36.657  INFO 71837 --- [nio-8002-exec-5] c.c.approov.jwt.ApiController            : Serving request for endpoint '/', that is protect by an Approov Token.
+2025-10-15 09:03:44.780  INFO 71837 --- [nio-8002-exec-7] c.c.a.j.a.ApproovAuthentication          : Request approved with a valid Approov token.
+2025-10-15 09:03:44.780  INFO 71837 --- [nio-8002-exec-7] c.c.approov.jwt.ApiController            : Serving request for '/token-check' (Approov Token check).
+2025-10-15 09:03:54.894  INFO 71837 --- [nio-8002-exec-9] c.c.a.j.a.ApproovAuthentication          : Request approved with a valid Approov token.
+2025-10-15 09:03:54.898  INFO 71837 --- [nio-8002-exec-9] c.c.approov.jwt.ApiController            : Serving request for '/token-binding-check' (Approov Token Binding check).
+2025-10-15 09:52:28.038 ERROR 71837 --- [nio-8002-exec-1] .c.a.j.a.ApproovAuthenticationEntryPoint : 400 BAD_REQUEST | class org.springframework.security.authentication.InsufficientAuthenticationException | Full authentication is required to access this resource | Stacktrace origin: org.springframework.security.web.access.ExceptionTranslationFilter.handleAccessDeniedException(ExceptionTranslationFilter.java:195)
+2025-10-15 09:53:19.405 ERROR 71837 --- [nio-8002-exec-2] .c.a.j.a.ApproovAuthenticationEntryPoint : 400 BAD_REQUEST | class org.springframework.security.authentication.InsufficientAuthenticationException | Full authentication is required to access this resource | Stacktrace origin: org.springframework.security.web.access.ExceptionTranslationFilter.handleAccessDeniedException(ExceptionTranslationFilter.java:195)
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.6.4)
+
+2025-10-15 10:04:03.952  INFO 71837 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Starting Application using Java 21.0.8 on Kamils-Mac-mini.local with PID 71837 (/Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check/build/classes/java/main started by km in /Users/km/Desktop/GitHubRepos/FixQuickStart/JavaSpring/quickstart-java-spring-token-check/servers/hello/src/approov-protected-server/token-binding-check)
+2025-10-15 10:04:03.952  INFO 71837 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : No active profile set, falling back to 1 default profile: "default"
+2025-10-15 10:04:04.283  INFO 71837 --- [  restartedMain] c.criticalblue.approov.jwt.Application   : Started Application in 0.347 seconds (JVM running for 3725.334)
+
+> Task :bootRun FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':bootRun'.
+> Process 'command '/Users/km/Library/Java/JavaVirtualMachines/jbr-21.0.8/Contents/Home/bin/java'' finished with non-zero exit value 137
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 8.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+See https://docs.gradle.org/7.6.6/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD FAILED in 1h 2m 19s
+4 actionable tasks: 1 executed, 3 up-to-date
