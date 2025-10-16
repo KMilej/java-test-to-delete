@@ -17,7 +17,7 @@ public class ApiController {
 
     private static Logger logger = LoggerFactory.getLogger(ApiController.class);
 
-    public static boolean isTokenBindingEnebled;
+    public static boolean isTokenBindingEnebled = true;
 
 
     @GetMapping("/")
@@ -41,7 +41,6 @@ public class ApiController {
     public Map<String, Object> tokenBindingCheck(
             @RequestHeader(value = "Authorization", required = true) String authorizationHeader) {
         logger.info("Serving request for '/token-binding-check' (Approov Token check).");
-        isTokenBindingEnebled = true;
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("message", "This is the token-check endpoint.");
         response.put("detail", "Access permitted only when Approov Token is valid (handled by security filter).");
