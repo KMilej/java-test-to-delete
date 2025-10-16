@@ -211,4 +211,5 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
     public boolean containsContext(HttpServletRequest request) {
         return approovToken != null;
     }
+
 }
