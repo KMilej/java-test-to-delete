@@ -31,22 +31,20 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
 
     private boolean validTokenBinding;
 
-    /** NOWE: czy wymuszać token binding dla TEGO żądania */
+    /** NEW: whether to enforce token binding for THIS request */
     private final boolean enforceBinding;
 
-    // ───────────────────── KONSTRUKTORY ─────────────────────
-
-    /** Bez bindingu (domyślnie) */
+    /** Without binding (default) */
     public ApproovAuthentication(ApproovConfig approovConfig, String approovToken) {
         this(approovConfig, approovToken, null, false);
     }
 
-    /** Z bindingiem (domyślnie włączony, gdy podasz header) */
+    /** With binding (enabled by default when a header is provided) */
     public ApproovAuthentication(ApproovConfig approovConfig, String approovToken, String tokenBindingHeader) {
         this(approovConfig, approovToken, tokenBindingHeader, true);
     }
 
-    /** Główny konstruktor – jawnie sterujesz enforceBinding */
+    /** Main constructor – explicitly controls enforceBinding */
     public ApproovAuthentication(ApproovConfig approovConfig, String approovToken,
                                  String tokenBindingHeader, boolean enforceBinding) {
         this.approovConfig = approovConfig;
@@ -54,8 +52,14 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
         this.tokenBindingHeader = tokenBindingHeader;
         this.enforceBinding = enforceBinding;
     }
-
-    // ───────────────────── WERYFIKACJA ─────────────────────
+    /**
+     * Verifies the Approov token and, when enforceBinding == true,
+     * also checks the token binding.
+     *
+     * @param approovSecret The Approov secret for verifying the token signature.
+     * @throws ApproovAuthenticationException When the token is invalid or, when enforceBinding == true,
+     *                                        the token binding check fails.
+     */
 
     @Override
     public void verifyApproovToken(byte[] approovSecret) throws ApproovAuthenticationException {
@@ -86,11 +90,11 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
             throw new ApproovAuthenticationException(message, HttpStatus.UNAUTHORIZED.value());
         }
 
-        // ── KLUCZ: sprawdzaj binding tylko gdy enforceBinding == true
+        // ── KEY: check token binding only when enforceBinding == true
         if (enforceBinding) {
             if (tokenBindingHeader == null || tokenBindingHeader.isEmpty()) {
                 throw new ApproovAuthenticationException(
-                        "Token binding enabled for this endpoint, but binding header is missing.",
+                        "Token binding enabled for this endpoint, but the binding header is missing.",
                         HttpStatus.UNAUTHORIZED.value());
             }
             validTokenBinding = approovPayload.checkClaimMatchesFor(
@@ -101,13 +105,12 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
                         "Approov token binding mismatch.", HttpStatus.UNAUTHORIZED.value());
             }
         } else {
-            validTokenBinding = true; // binding wyłączony dla tego endpointu
+            validTokenBinding = true; // binding disabled for this endpoint
         }
 
         isAuthenticated = true;
     }
 
-    // ───────────────────── GETTERY / INTERFEJS ─────────────────────
 
     @Override
     public Claims getApproovTokenPayloadClaims() { return approovTokenPayloadClaims; }
