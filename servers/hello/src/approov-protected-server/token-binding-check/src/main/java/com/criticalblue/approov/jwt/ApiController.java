@@ -24,7 +24,7 @@ public class ApiController {
     public Map<String, Object> helloV1() {
         logger.info("Serving request for endpoint '/', that is protect by an Approov Token.");
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "Hello, World!");
+        response.put("details", "unprotected endpoint '/' & no Approov token required. & no Approov checks performed.");
         return response;
     }
 
@@ -32,8 +32,7 @@ public class ApiController {
     public Map<String, Object> tokenCheck() {
         logger.info("Serving request for '/token-check' (Approov Token check).");
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "This is the token-check endpoint.");
-        response.put("detail", "Access permitted only when Approov Token is valid (handled by security filter).");
+        response.put("details", "endpoint '/token-check' & Approov token valid & Approov checks performed");
         return response;
     }
 
@@ -42,8 +41,7 @@ public class ApiController {
             @RequestHeader(value = "Authorization", required = true) String authorizationHeader) {
         logger.info("Serving request for '/token-binding-check' (Approov Token check).");
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "This is the token-check endpoint.");
-        response.put("detail", "Access permitted only when Approov Token is valid (handled by security filter).");
+        response.put("details", "endpoint '/token-binding-check' & Approov token valid & Approov checks performed");
         System.out.println("isTokenBindingEnebled: " + isTokenBindingEnebled);
         response.put("isTokenBindingEnebled", isTokenBindingEnebled);
 
@@ -57,8 +55,7 @@ public class ApiController {
         logger.info("Serving request for '/token-binding-check-with-two-values' (Approov Token Binding check with two values).");
 
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "This is the token-binding-check-with-two-values endpoint.");
-        response.put("hint", "Server-side filter verifies the Approov token's binding to the chosen header values.");
+        response.put("details", "endpoint '/token-binding-check-with-two-values' & Approov token valid & Approov checks performed");
         response.put("authorizationHeaderPresent", authorizationHeader != null && !authorizationHeader.isEmpty());
         response.put("customHeaderPresent", customHeader != null && !customHeader.isEmpty());
         return response;
@@ -68,8 +65,7 @@ public class ApiController {
         public Map<String, Object> messageSigningCheck() {
         logger.info("Serving request for '/message-signing-check' (Approov Message Signing check).");
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "This is the message-signing-check endpoint.");
-        response.put("detail", "Server-side filter validates the Approov signature for the request.");
+        response.put("details", "endpoint '/message-singing-check' & Approov token valid & Approov checks performed");
         return response;
     }
 }
