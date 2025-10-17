@@ -118,7 +118,7 @@ run_test "$DESC_ROOT"                 "$URL_ROOT"                 -X GET -H "App
 run_test "$DESC_TOKEN_CHECK"          "$URL_TOKEN_CHECK"          -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
 run_test "$DESC_TOKEN_BINDING_CHECK"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
 run_test "$DESC_TOKEN_BINDING_CHECK (invalid authorization header )"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${WRONG_AUTHORIZATION_HEADER}"
-
+run_test "$DESC_TOKEN_BINDING_CHECK_TWO_VALUE" "$URL_TOKEN_BINDING_CHECK_TWO_VALUE" -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
 sleep 7
 
 echo "======================================================================================================"
