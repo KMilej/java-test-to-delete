@@ -31,68 +31,72 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         HttpServletRequest request = requestResponseHolder.getRequest();
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        // 1) Read Approov-Token (name is configurable in ApproovConfig)
-        String approovToken = request.getHeader(approovConfig.getApproovHeaderName());
-        if (approovToken == null) {
-            // No token -> leave context empty; protected endpoints will be rejected later.
-            return context;
-        }
+        if (ApiController.isApproovEnabled()) {
 
-        // 2) Decide per endpoint
-        String path = request.getRequestURI();
-        if (path == null) path = "";
 
-        boolean enforceBinding;
-        Authentication approovAuthentication;
-
-        switch (path) {
-            case "/":
-            case "/token-check": {
-                // No token binding for these
-                enforceBinding = false;
-                approovAuthentication = new ApproovAuthentication(
-                        approovConfig, approovToken, null, false);
-                break;
+            // 1) Read Approov-Token (name is configurable in ApproovConfig)
+            String approovToken = request.getHeader(approovConfig.getApproovHeaderName());
+            if (approovToken == null) {
+                // No token -> leave context empty; protected endpoints will be rejected later.
+                return context;
             }
 
-            case "/token-binding-check": {
-                // Single-value token binding (e.g., Authorization header)
-                enforceBinding = true;
-                String single = getSingleBindingValue(request);
-                approovAuthentication = new ApproovAuthentication(
-                        approovConfig, approovToken, single, true);
-                break;
-            }
+            // 2) Decide per endpoint
+            String path = request.getRequestURI();
+            if (path == null) path = "";
 
-            case "/token-binding-check-with-two-values": {
-                // Double-value token binding: "Authorization==Content-Digest=="
-                enforceBinding = true;
-                String combined = getCombinedBindingValue(request);
-                approovAuthentication = new ApproovAuthentication(
-                        approovConfig, approovToken, combined, true);
-                break;
-            }
+            boolean enforceBinding;
+            Authentication approovAuthentication;
 
-            default: {
-                // Fallback to global toggle
-                enforceBinding = ApiController.isTokenBindingEnebled;
-                if (enforceBinding) {
+            switch (path) {
+                case "/":
+                case "/token-check": {
+                    // No token binding for these
+                    enforceBinding = false;
+                    approovAuthentication = new ApproovAuthentication(
+                            approovConfig, approovToken, null, false);
+                    break;
+                }
+
+                case "/token-binding-check": {
+                    // Single-value token binding (e.g., Authorization header)
+                    enforceBinding = true;
                     String single = getSingleBindingValue(request);
                     approovAuthentication = new ApproovAuthentication(
                             approovConfig, approovToken, single, true);
-                } else {
-                    approovAuthentication = new ApproovAuthentication(
-                            approovConfig, approovToken, null, false);
+                    break;
                 }
-                break;
+
+                case "/token-binding-check-with-two-values": {
+                    // Double-value token binding: "Authorization==Content-Digest=="
+                    enforceBinding = true;
+                    String combined = getCombinedBindingValue(request);
+                    approovAuthentication = new ApproovAuthentication(
+                            approovConfig, approovToken, combined, true);
+                    break;
+                }
+
+                default: {
+                    // Fallback to global toggle
+                    enforceBinding = ApiController.isTokenBindingEnebled;
+                    if (enforceBinding) {
+                        String single = getSingleBindingValue(request);
+                        approovAuthentication = new ApproovAuthentication(
+                                approovConfig, approovToken, single, true);
+                    } else {
+                        approovAuthentication = new ApproovAuthentication(
+                                approovConfig, approovToken, null, false);
+                    }
+                    break;
+                }
             }
+
+            // 3) Put into context
+            context.setAuthentication(approovAuthentication);
+            return context;
         }
-
-        // 3) Put into context
-        context.setAuthentication(approovAuthentication);
-        return context;
+        return org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
     }
-
     /**
      * Single-value binding: read the header configured in ApproovConfig (e.g., "Authorization").
      */
