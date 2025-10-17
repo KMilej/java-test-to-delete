@@ -74,8 +74,7 @@ run_test "$DESC_ROOT"                 "$URL_ROOT"                 -X GET
 run_test "$DESC_TOKEN_CHECK"          "$URL_TOKEN_CHECK"          -X GET
 run_test "$DESC_TOKEN_BINDING_CHECK"  "$URL_TOKEN_BINDING_CHECK"  -X GET
 
-
-sleep 2
+sleep 5
 
 TOKEN="$(
   approov token -genExample api.example.com \
@@ -95,7 +94,8 @@ echo "============================================================"
 run_test "$DESC_ROOT"                 "$URL_ROOT"                 -X GET -H "Approov-Token: ${TOKEN}"
 run_test "$DESC_TOKEN_CHECK"          "$URL_TOKEN_CHECK"          -X GET -H "Approov-Token: ${TOKEN}"
 run_test "$DESC_TOKEN_BINDING_CHECK"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${TOKEN}"
-sleep 5
+
+sleep 6
 
 VALUE="Kmilej"  # value of the bound header
 BINDING_TOKEN="$(
@@ -119,11 +119,12 @@ run_test "$DESC_TOKEN_CHECK"          "$URL_TOKEN_CHECK"          -X GET -H "App
 run_test "$DESC_TOKEN_BINDING_CHECK"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
 run_test "$DESC_TOKEN_BINDING_CHECK (invalid authorization header )"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${WRONG_AUTHORIZATION_HEADER}"
 
-sleep 4
+sleep 7
+
 echo "======================================================================================================"
 echo "=========== 4) Tests WITH three headers: Approov-Token + Authorization + Content-Digest =============="
 echo "======================================================================================================"
-echo "=== curl -iX GET 'http:/localhost:8002/ -H 'Approov-Token' -H 'Authorization' -H 'Content-Digest' ==="
+echo "=== curl -iX GET 'http:/localhost:8002/ -H 'Approov-Token' -H 'Authorization' -H 'Content-Digest' ===="
 echo "======================================================================================================"
 
 HASH_INPUT="ExampleAuthToken==ContentDigest=="
@@ -142,6 +143,7 @@ run_test "$DESC_ROOT"                            "$URL_ROOT" -X GET -H 'Authoriz
 run_test "$DESC_TOKEN_CHECK"                     "$URL_TOKEN_CHECK" -X GET -H 'Authorization: ExampleAuthToken==' -H 'Content-Digest: ContentDigest==' -H "Approov-Token: $BINDING_TOKEN_THREE_HEADERS"
 run_test "$DESC_TOKEN_BINDING_CHECK"             "$URL_TOKEN_BINDING_CHECK" -X GET -H 'Authorization: ExampleAuthToken==' -H 'Content-Digest: ContentDigest==' -H "Approov-Token: $BINDING_TOKEN_THREE_HEADERS"
 run_test "$DESC_TOKEN_BINDING_CHECK_TWO_VALUE"   "$URL_TOKEN_BINDING_CHECK_TWO_VALUE" -X GET -H 'Authorization: ExampleAuthToken==' -H 'Content-Digest: ContentDigest==' -H "Approov-Token: $BINDING_TOKEN_THREE_HEADERS"
+run_test "$DESC_TOKEN_BINDING_CHECK_TWO_VALUE (invalid authorization header )"   "$URL_TOKEN_BINDING_CHECK_TWO_VALUE" -X GET -H 'Authorization: ExampleAuthToken=' -H 'Content-Digest: ContentDigest==' -H "Approov-Token: $BINDING_TOKEN_THREE_HEADERS"
 
 
-echo "== Done =="
+echo "==================== Done ===================="

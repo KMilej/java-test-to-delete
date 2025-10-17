@@ -18,6 +18,7 @@ public class ApiController {
     private static Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     public static boolean isTokenBindingEnebled = true;
+    public static boolean FalseToTurnOffApproovEntirely = false;
 
 
     @GetMapping("/")
@@ -27,6 +28,7 @@ public class ApiController {
         response.put("details", "unprotected endpoint '/' & no Approov token required. & no Approov checks performed.");
         return response;
     }
+
 
     @GetMapping("/token-check")
     public Map<String, Object> tokenCheck() {

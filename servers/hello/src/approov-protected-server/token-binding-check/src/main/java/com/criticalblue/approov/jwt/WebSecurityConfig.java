@@ -82,9 +82,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/token-check").authenticated()
                     .antMatchers("/token-binding-check").authenticated()
                     .antMatchers("/message-signing-check").authenticated()
-                    .antMatchers("/token-binding-check-with-two-values").authenticated()
+                    .antMatchers("/token-binding-check-with-two-values").authenticated();
                     // anything else is denied (optional but good practice)
-                    .anyRequest().denyAll();
+                    //.anyRequest().denyAll();
         }
     }
 }
