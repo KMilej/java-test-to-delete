@@ -76,6 +76,7 @@ BINDING_TOKEN="$(
     | grep -oE '[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+' \
     | head -n1
 )"
+WRONG_AUTHORIZATION_HEADER="WrongValue"  # wrong value for negative test
 
 echo "=============================="
 echo "BindingToken=${BINDING_TOKEN}"
@@ -85,6 +86,7 @@ echo "== 3a) Tests WITH two headers: Approov-Token + Authorization =="
 run_test "$DESC_ROOT"                 "$URL_ROOT"                 -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
 run_test "$DESC_TOKEN_CHECK"          "$URL_TOKEN_CHECK"          -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
 run_test "$DESC_TOKEN_BINDING_CHECK"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${VALUE}"
+run_test "$DESC_TOKEN_BINDING_CHECK (invalid authorization header )"  "$URL_TOKEN_BINDING_CHECK"  -X GET -H "Approov-Token: ${BINDING_TOKEN}" -H "Authorization: ${WRONG_AUTHORIZATION_HEADER}"
 echo "=============================="
 echo "== 4) Tests WITH three headers: Approov-Token + Authorization + Content-Digest =="
 
@@ -101,10 +103,10 @@ BINDING_TOKEN_THREE_HEADERS="$(
 echo "TOKEN: $BINDING_TOKEN_THREE_HEADERS"
 
 # Note: we pass WITHOUT '==', because the server will append them when combining
-curl -i GET 'http://localhost:8002/token-binding-check-with-two-' \
--H "Authorization: ExampleAuthToken==" \
--H "Content-Digest: ContentDigest==" \
--H "Approov-Token: $BINDING_TOKEN_THREE_HEADERS"
+curl -i -X GET 'http://localhost:8002/token-binding-check-with-two-values' \
+  -H 'Authorization: ExampleAuthToken==' \
+  -H 'Content-Digest: ContentDigest==' \
+  -H "Approov-Token: $BINDING_TOKEN_THREE_HEADERS"
 
 echo "== Done =="
 #

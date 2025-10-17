@@ -113,9 +113,8 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         String digest = trimOrNull(request.getHeader("Content-Digest"));
         if (auth == null || digest == null) return null;
 
-        // !!! Keep format EXACTLY the same as in CLI !!!
-        // Example: "ExampleAuthToken==ContentDigest=="
-        return auth + "==" + digest + "==";
+        // EXACT same bytes as you pass to -setDataHashInToken:
+        return auth + digest; // no extra "==" added here
     }
 
     private String trimOrNull(String v) {
