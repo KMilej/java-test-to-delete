@@ -66,7 +66,7 @@ dependencies {
 }
 ```
 
-Next, add the package `com.criticalblue.approov.jwt.authentication` to your current project by copying (from this repo) the entire [authentication](/servers/hello/src/approov-protected-server/token-check/src/main/java/com/criticalblue/approov/jwt/authentication) folder into your project.
+Next, add the package `com.criticalblue.approov.jwt.authentication` to your current project by copying (from this repo) the entire [authentication](/server/approov-protected-server/token-check/src/main/java/com/criticalblue/approov/jwt/authentication) folder into your project.
 
 
 Now, use it from the class in your project that extends the `WebSecurityConfigurerAdapter`. For example:

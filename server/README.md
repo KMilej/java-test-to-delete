@@ -212,7 +212,7 @@ approov secret -get base64 -plain
 ```
 The Approov account secret is highly sensitive — it can be used to generate valid tokens and must never be exposed or stored in public code.
 
-Now, set the Approov account secret in the environment variable `APPROOV_BASE64_SECRET` inside the `.env` line 18, file [here](./.env).
+Now, set the Approov account secret in the environment variable `APPROOV_BASE64_SECRET` inside the `.env` line 18, file [here](.env).
 
 After setting the Approov account secret you can run the server again:
 
@@ -291,16 +291,16 @@ If both checks succeed, the request is trusted.
 If not, the server rejects it to prevent **token replay or misuse**.
 
 Core implementation:
-- [`ApproovAuthentication.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) — verifies token and binding
-- [`ApproovSecurityContextRepository.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java) — applies security context for the validation
+- [`ApproovAuthentication.java`](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java) — verifies token and binding
+- [`ApproovSecurityContextRepository.java`](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java) — applies security context for the validation
 
 > 💡 **Step 1:**  
-> In [`ApproovSecurityContextRepository.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java):
+> In [`ApproovSecurityContextRepository.java`](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovSecurityContextRepository.java):
 > - **Uncomment lines 53–54**
 > - **Comment out line 57**
 >
 > 💡 **Step 2:**  
-> In [`ApproovAuthentication.java`](./src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java):
+> In [`ApproovAuthentication.java`](src/main/java/com/criticalblue/approov/jwt/authentication/ApproovAuthentication.java):
 > - **Uncomment line 95** to enable Approov token binding validation.
 
 

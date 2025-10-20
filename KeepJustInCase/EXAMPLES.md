@@ -13,7 +13,7 @@ To learn more about each Hello server example you need to read the README for ea
 
 * [Unprotected Server](./servers/hello/src/unprotected-server)
 * [Approov Protected Server - Token Check](./servers/hello/src/approov-protected-server/token-check)
-* [Approov Protected Server - Token Binding Check](../servers/hello/src/approov-protected-server/token-binding-check)
+* [Approov Protected Server - Token Binding Check](../server/approov-protected-server/token-binding-check)
 
 
 ## Docker Stack
