@@ -2,7 +2,7 @@
 
 [Approov](https://approov.io) is an API security solution used to verify that requests received by your backend services originate from trusted versions of your mobile apps, and here you can find the Hello servers examples that are the base for the Approov [quickstarts](/docs) for the Java Spring framework.
 
-For more information about how Approov works and why you should use it you can read the [Approov Overview](/OVERVIEW.md) at the root of this repo.
+For more information about how Approov works and why you should use it you can read the [Approov Overview](/KeepJustInCase/OVERVIEW.md) at the root of this repo.
 
 If you are looking for the Approov quickstarts to integrate Approov in your Java Spring API server then you can find them [here](/docs).
 
@@ -13,7 +13,7 @@ To learn more about each Hello server example you need to read the README for ea
 
 * [Unprotected Server](./servers/hello/src/unprotected-server)
 * [Approov Protected Server - Token Check](./servers/hello/src/approov-protected-server/token-check)
-* [Approov Protected Server - Token Binding Check](./servers/hello/src/approov-protected-server/token-binding-check)
+* [Approov Protected Server - Token Binding Check](../servers/hello/src/approov-protected-server/token-binding-check)
 
 
 ## Docker Stack

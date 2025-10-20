@@ -28,9 +28,7 @@ public class ApiController {
         return TOKEN_BINDING_ENABLED.get();
     }
 
-    // =========================
-    //        Admin Endpoints
-    // =========================
+    //Admin Endpoints
 
     @GetMapping("/admin/approov/status")
     public Map<String, Object> approovStatus() {
@@ -81,9 +79,7 @@ public class ApiController {
         return response;
     }
 
-    // =========================
-    //        API Endpoints
-    // =========================
+    //API Endpoints
 
     @GetMapping("/")
     public Map<String, Object> helloV1() {
