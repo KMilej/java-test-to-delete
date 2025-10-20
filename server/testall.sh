@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail  # fail on error, undefined variable, or pipe failure
 
+# Test of DOCKER
+
+BASE_URL="${BASE_URL:-http://localhost:8002}"
+
+# Wait for app to be ready
+echo "[wait] Checking $BASE_URL ..."
+for i in {1..30}; do
+  if curl -sf "$BASE_URL/" >/dev/null 2>&1; then
+    echo "[ok] App is ready!"
+    break
+  fi
+  echo "[wait] still starting..."
+  sleep 2
+done
+
 # --- Config ---
 BASE_URL="http://localhost:8002"
 URL_ROOT="${BASE_URL}"

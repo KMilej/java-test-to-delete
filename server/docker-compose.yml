@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./:/workspace
+      - gradle-cache:/workspace/.gradle
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8002/ || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  tests:
+    image: eclipse-temurin:17-jdk
+    depends_on:
+      app:
+        condition: service_healthy
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    entrypoint: [ "bash", "-lc" ]
+    command: [ "./testall.sh" ]
+
+volumes:
+  gradle-cache:
