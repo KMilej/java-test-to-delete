@@ -1,37 +1,45 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.4'
-	id 'java'
+    id 'org.springframework.boot' version '2.6.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
-
-apply plugin: 'io.spring.dependency-management'
 
 group = 'com.criticalblue'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+
+// Prefer Java 17 for Gradle + IntelliJ consistency
+sourceCompatibility = '17'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-integration'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.security:spring-security-core'
-	implementation 'org.springframework.security:spring-security-web'
-	implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.boot:spring-boot-starter-web'          // brings spring-webmvc
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
 
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2',
-            // Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
-            //'org.bouncycastle:bcprov-jdk15on:1.60',
-            'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    // JJWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    // If you need PS256/384/512:
+    // implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
 
-	compileOnly 'org.jetbrains:annotations:17.0.0'
+    compileOnly 'org.jetbrains:annotations:17.0.0'
 
-	compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+    // ❌ REMOVE: this downgrades the servlet API and breaks webmvc
+    // compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
 
-	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+// (optional) set your entry point if needed for bootRun/bootJar:
+tasks.named('bootRun') {
+    mainClass = 'com.criticalblue.approov.jwt.Application' // <-- change to your @SpringBootApplication
+}
+bootJar {
+    mainClass = 'com.criticalblue.approov.jwt.Application'
 }
