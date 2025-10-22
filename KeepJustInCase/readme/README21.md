@@ -18,16 +18,6 @@ This repository implements the Approov server-side request verification code usi
 * Spring Boot version: 2.6.4
 * Gradle version: 7.6.6
 ```
-<details>
-  <summary><b>Docker Environment:</b></summary>
-  <pre><code>* Docker version: 28.5.1
-* Services:
-    * app → Spring Boot application container (built from Dockerfile.dev)
-    * tests → JDK 17 test container running ./testall.sh
-* Base Image (Container OS): eclipse-temurin:17-jdk (Debian-based)
-</code></pre>
-</details>
-
 
 ### TOC - Table of Contents
 
@@ -72,13 +62,26 @@ This repository implements the Approov server-side request verification code usi
 "Try It Out Yourself, follow the steps below to run semi-automatically, manually or build and run it automatically using Docker."
 ```
 
+---
+
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
   <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" width="40" style="vertical-align:middle; margin-right:10px;" />
   <strong>Run with Docker</strong>
 </summary>
 
-Follow the provided steps to build and start the example using Docker.
+## Requirements
+
+```test
+Docker Environment:
+Docker version: 28.5.1
+* Services:
+    * app → Spring Boot application container (built from Dockerfile.dev)
+    * tests → JDK 17 test container running ./testall.sh
+* Base Image (Container OS): eclipse-temurin:17-jdk (Debian-based)
+
+```
+
 
 </details>
 
@@ -106,7 +109,7 @@ Manually build and start the Spring application.
 
 </details>
 
-
+---
 
 
 
