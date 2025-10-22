@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: app-1
+    container_name: app-approov
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -20,7 +20,7 @@ services:
       retries: 20
 
   tests:
-    container_name: test-1
+    container_name: test-approov
     image: eclipse-temurin:17-jdk
     depends_on:
       app:

@@ -80,8 +80,21 @@ Docker version: 28.5.1
     * tests → JDK 17 test container running ./testall.sh
 * Base Image (Container OS): eclipse-temurin:17-jdk (Debian-based)
 
+### Docker, Colima and Docker-Compose
+Docker Compose version 2.40.1
+colima version 0.9.1
 ```
 
+#### Install Docker, Colima and Docker-Compose via Homebrew
+```bash # On macOS install with Homebrew
+brew install docker colima docker-compose
+```
+
+If you have all requirements installed, you can build and run the example inside `quickstart-java-spring`:
+
+```bash
+bash javaSpringApproov.sh
+```
 
 </details>
 
@@ -90,10 +103,38 @@ Docker version: 28.5.1
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
   <img src="https://cdn-icons-png.flaticon.com/512/3097/3097412.png" width="40" style="vertical-align:middle; margin-right:10px;" />
-  <strong>Run Semi-Automatically</strong>
+  <strong>Run Semi-Automatically in IDE</strong>
 </summary>
 
-Run the provided helper script to automatically build and launch the example with minimal setup.
+### you should have already:
+```text
+* JVM: 17.0.14
+* Spring Boot version: 2.6.4
+* Gradle version: 7.6.6
+* Approov CLI initialized
+
+```
+
+#### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
+#### inside the project folder `quickstart-java-spring`, run:
+
+```bash
+./gradlew build
+```
+
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+<h4>When the server is running, you can test the endpoints using bash script in a different terminal.</h4>
+
+```bash
+bash testall.sh
+```
+
+
 
 </details>
 
@@ -105,7 +146,72 @@ Run the provided helper script to automatically build and launch the example wit
   <strong>Run Manually</strong>
 </summary>
 
-Manually build and start the Spring application.
+### you should have already:
+```text
+* JVM: 17.0.14
+* Spring Boot version: 2.6.4
+* Gradle version: 7.6.6
+* Approov CLI initialized
+```
+
+#### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
+#### inside the project folder `quickstart-java-spring`, run:
+
+```bash
+./gradlew build
+```
+
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+### ===========================================================
+### 1. Unprotected Endpoint (No Approov)
+### ===========================================================
+
+- The client sends a normal HTTPS request.
+- The server **does not verify** any Approov token or extra authentication header.
+- This means **any client** (even tampered or unauthorized) can call the API if they know the URL.
+
+### ===========================================================
+### 2. Approov Token check
+### ===========================================================
+
+- The client includes an **`Approov-Token`** (a short-lived JWT) in each API request header.
+- The server verifies this token using the ** Approov secret key** that is securely configured on the backend and checks:
+    -  Token verification - confirms the token is still valid.
+    -  Expiration (`exp` claim) - ensures the token is still valid.
+- If the token is valid → request is trusted.
+- If invalid → server returns **`401 Unauthorized`**.
+- **Purpose**: Protect API endpoints so that only authentic, unmodified Approov-integrated apps can access them.
+
+### ===========================================================
+### 3. Approov Token Binding check
+### ===========================================================
+
+- The client sends two headers on authenticated API calls:
+    - **`Approov-Token`**
+    - **`Authorization`** header containing a hash of specific request data (e.g., access token or session ID).
+- The server verifies the token **and** ensures that the bound value matches what the app used.
+- Prevents token replay — the Approov token **cannot be reused or stolen** for another session.
+- **Use case:** stronger protection for **authenticated API calls** tied to a specific user or device.
+
+### ===========================================================
+### 3. Approov Token Binding check with two different bound values
+### ===========================================================
+
+- The client sends three headers on authenticated API calls:
+    - **`Approov-Token`**
+    - **`Authorization`**
+    - **`Content-Digest`** It is combined with the `Authorization` header to create a stronger binding.
+- Both are included in the hash inside the Approov token. This means the server verifies a single hash that covers both authentication credentials.
+- **Use case:** This configuration provides the highest level of protection for authenticated API requests:
+
+
+
+
 
 </details>
 
@@ -120,19 +226,10 @@ Manually build and start the Spring application.
 The quickstart can be enabled/disabled by running the following commands:
 
 ```bash
-curl "http://localhost:8111/approov-toggle?enabled=true"
-curl "http://localhost:8111/approov-toggle?enabled=false" 
+curl -X POST http://localhost:8002/admin/approov/disable
+
+curl -X POST http://localhost:8002/admin/approov/enable
 ```
-
-### Restart NGINX After Code Changes
-
-To test code changes live:
-
-```bash
-./reload_nginx.sh    
-```
-
-This script will reload NGINX automatically.
 
 ## Get Up and Running
 
@@ -140,12 +237,6 @@ This script will reload NGINX automatically.
 
 ```bash
 approov role
-```
-
-* For the Windows powershell:
-
-```bash
-set APPROOV_ROLE=admin:___YOUR_APPROOV_ACCOUNT_NAME_HERE___
 ```
 
 #### 2. Add your api domain, if not added yet
@@ -156,10 +247,6 @@ approov api -list
 ```
 #### 3. Run the automation setup script:
 
-```bash
-./run_cli.sh
-```
-
 This script will:
 * Run the api command list, to ensure user is logged in.
 * Build the Docker image.
@@ -169,170 +256,6 @@ This script will:
 
 **NOTE:** If user is not logged in yet, approov cli will prompt the user to enter their password. If the user is logged in, then user will see a list of api domains.
 
-## Running Automated Tests
-
-#### 1. Run the token check curl requests
-Run them in a different shell, the first 2 tests should report a good token, the last 3 should report a bad token:
-
-```bash
-./openresty-server/tests/request_tests_approov.sh
-```
-
-Message signing tests are covered by other test scripts.
-
-First, several tests checking the functionality of the HTTP structured field
-values implementation, [RFC-9651](https://www.rfc-editor.org/rfc/rfc9651),
-covered by sfv.lua. This was developed internally by Approov Ltd. base on other
-open source implementations - specifically the Apache licensed implementation
-used by the OkHttp Approov service layer.
-
-```bash
-./openresty-server/tests/request_tests_sfv.sh
-```
-
-Lastly, the Approov message signing tests use several steps to first build a
-message and a signature and then send a request that verifies the message
-reconstructed by the Approov token check flow. Signature properties are
-provided by following the draft HTTP Message Signatures standard,
-[RFC 9421](https://www.rfc-editor.org/rfc/rfc9421).
-
-```bash
-./tests/request_tests_approov_msg.sh
-```
-### Running Manual Tests
-
-<details>
-<summary>Manual Test Steps (step-by-step guide)</summary>
-
-### Token Check
-
-To use Approov with the Lua OpenResty server, a small amount of configuration is required.
-- First, Approov must be configured with the domain of the API you are protecting.
-- Second, the OpenResty server needs the Approov Base64-encoded secret, which is used to verify the tokens generated by the Approov cloud service.
-
-This secret is included directly in the Lua token verification logic found in
-[/openresty-server/lua/lua.d/approov.lua](/openresty-server/lua/lua.d/approov.lua), and must match the one assigned to your Approov account.
-
-[Setup](#get-up-and-running) is the same one used for the automated tests
-
-#### 1. Set up the Approov Secret
-Approov tokens are signed with a symmetric secret. To verify tokens, we need to grab the secret using the [Approov secret command](https://approov.io/docs/latest/approov-cli-tool-reference/#secret-command) and plug it into the NodeJS API server environment to check the signatures of the [Approov Tokens](https://www.approov.io/docs/latest/approov-usage-documentation/#approov-tokens) that it processes.
-
-* Health Check:
-```bash
-curl http://localhost:8111/hello
-```
-
-* Retrieve the Approov secret with:
-```bash
-approov secret -get base64
-```
-
-> **NOTE:** The `approov secret` command requires an [administration role](https://approov.io/docs/latest/approov-usage-documentation/#account-access-roles) to execute successfully.
-
-
-* Set the Approov secret in the port80_server.conf, replacing the lines 100 and 158 in the NGINX config with the base64 secret.
-
-```bash
-set $jwt_secret “TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/AA”;
-```
-* Reload the server
-```bash
-./reload_server.sh
-```
-
-#### 2. Export Token
-```bash
-export TOKEN=$(approov token --genExample example.com | head -1)
-```
-
-* Call the endpoint
-```bash
-curl -i http://localhost:8111/token \
-  -H "Approov-Token: $TOKEN"
-```
-> Expected: "200 OK"
-
-### Token Binding with one-header
-
-#### 1. Edit the NGINX Config
-Configure your NGINX server to use only one-header for token binding. By setting the header list to {"authorization"}.
-
-* Open the file ./openresty-server/conf/conf.d/port80_server.conf and uncomment the lines 149 to 151 to enable one-header binding.
-
-```bash
-rewrite_by_lua_block {
-    ngx.ctx.approov_token_binding_headers = {"authorization"};
-}
-```
-* Comment lines 154-156 to disable two-header binding.
-
-#### 2. Choose header value to send
-Pick the value you will use for the Authorization header in your test request. This value must be used consistently for both token generation and the request.
-```bash
-export HASH_INPUT="Bearer abc"
-```
-
-#### 3. Generate the Approov Token
-Create an Approov token with a binding claim that matches the hash of your chosen header value. This ensures the token is valid only when the request includes the correct header.
-```bash
-export TOKEN_BIND1=$(approov token --genExample example.com \
-  -setDataHashInToken "$HASH_INPUT" | head -1)
-```
-
-#### 4. Send the Test Request
-Make a request to the /token_binding endpoint, including the Authorization header and the generated Approov token. The server will validate the token binding and respond with success if everything matches.
-```bash
-curl -i http://localhost:8111/token_binding \
-  -H "Approov-Token: $TOKEN_BIND1" \
-  -H "Authorization: Bearer abc"
-```
-> Expected response: HTTP/1.1 200 OK
-
-
-### Token Binding with two headers
-
-#### 1. Edit he NGINX Config
-By uncommenting the specified lines, you instruct the Lua code to use both the authorization and x-device-id headers when validating the token binding. This ensures the server checks the combined values of these headers against the claim in the Approov token.
-
-* Open the file ./openresty-server/conf/conf.d/port80_server.conf and uncomment the lines 154 to 156 to enable the two header binding test,
-```bash
-rewrite_by_lua_block {
-    ngx.ctx.approov_token_binding_headers = {"authorization", "x-device-id"};
-}
-```
-* Comment the line 149 to 151 to disable one-header test.
-
-#### 2. Choose header values to send
-Select the actual values you will use for the Authorization and X-Device-Id headers in your test request. These values must be consistent throughout the process, as they will be used to generate the hash input for the token and sent in the request.
-```bash
-export AUTH_VAL="Bearer abc"
-export DEVICE_VAL="dev-123"
-```
-
-#### 3. Concatenate header values (No separator)
-Combine the chosen header values into a single string, without any separator. This concatenated string is what the Approov token binding logic expects and will be used to generate the hash claim in the token.
-```bash
-export HASH_INPUT="${AUTH_VAL}${DEVICE_VAL}"
-```
-
-#### 4. Generate the Approov Token
-Create an Approov token whose binding claim matches the hash of your concatenated header values. This step ensures the token is valid only if the request includes the exact header values you specified.
-```bash
-export TOKEN_BIND2=$(approov token --genExample example.com \
-  -setDataHashInToken "$HASH_INPUT" | head -1)
-```
-
-#### 5. Send the Test Request
-Make a request to the /token_binding endpoint, including both headers and the generated Approov token. If everything matches, the server will validate the token binding and respond with a success response.
-```bash
-curl -i http://localhost:8111/token_binding \
-  -H "Approov-Token: $TOKEN_BIND2" \
-  -H "Authorization: ${AUTH_VAL}" \
-  -H "X-Device-Id: ${DEVICE_VAL}"
-```
-> Expected response: HTTP/1.1 200 OK
-</details>
 
 ### Troubleshooting
 - [Check approov service is enabled or reload the server](#useful-commands)
@@ -348,7 +271,16 @@ curl -i http://localhost:8111/token_binding \
 
 ### Useful Links
 
-- [Approov CLI Reference](https://ext.approov.io/docs/latest/approov-cli-tool-reference/)
-- [OpenResty + Lua Docs](https://openresty.org/)
-- [Support](https://approov.io/contact/)
+* [Approov Free Trial](https://approov.io/signup)(no credit card needed)
+* [Approov Get Started](https://approov.io/product/demo)
+* [Approov QuickStarts](https://approov.io/docs/latest/approov-integration-examples/)
+* [Approov Docs](https://approov.io/docs)
+* [Approov Blog](https://approov.io/blog/)
+* [Approov Resources](https://approov.io/resource/)
+* [Approov Customer Stories](https://approov.io/customer)
+* [Approov Support](https://approov.io/contact)
+* [About Us](https://approov.io/company)
+* [Contact Us](https://approov.io/contact)
+
+[Back to Table of Contents](#toc---table-of-contents)
 

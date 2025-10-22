@@ -110,5 +110,5 @@ echo "       To stop containers: docker compose down"
 
 # Turn off running containers after tests
 docker ps
-docker stop app-1 || warn "Could not stop 'app-1'. Check service name or use 'docker compose down'."
-docker stop test-1 || warn "Could not stop 'tests-1'. Check service name or use 'docker compose down'."
+docker stop app-approov || warn "Could not stop 'app-approov'. Check service name or use 'docker compose down'."
+docker stop test-approov || warn "Could not stop 'tests-approov'. Check service name or use 'docker compose down'."
