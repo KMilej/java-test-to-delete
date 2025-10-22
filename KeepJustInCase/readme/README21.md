@@ -54,7 +54,7 @@ This repository implements the Approov server-side request verification code usi
    The app attaches this token to every API request using the `Approov-Token` HTTP header.
 
 3. **Server Validation:**  
-   The server verifies the token using the shared **Approov secret**, checking its:
+   The server verifies the token using the shared `**Approov secret**`, checking its:
     - Signature authenticity
     - Expiration (`exp` claim)
     - Other claims if configured
@@ -68,8 +68,43 @@ This repository implements the Approov server-side request verification code usi
     -  If all checks pass → the request is trusted and processed **`200 OK`**.
     -  If validation fails → the server responds with **`401 Unauthorized`**.
 
+```json
+"Try It Out Yourself, follow the steps below to run semi-automatically, manually or build and run it automatically using Docker."
+```
 
+<details>
+<summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
+  <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" width="40" style="vertical-align:middle; margin-right:10px;" />
+  <strong>Run with Docker</strong>
+</summary>
 
+Follow the provided steps to build and start the example using Docker.
+
+</details>
+
+---
+
+<details>
+<summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
+  <img src="https://cdn-icons-png.flaticon.com/512/3097/3097412.png" width="40" style="vertical-align:middle; margin-right:10px;" />
+  <strong>Run Semi-Automatically</strong>
+</summary>
+
+Run the provided helper script to automatically build and launch the example with minimal setup.
+
+</details>
+
+---
+
+<details>
+<summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
+  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png" width="40" style="vertical-align:middle; margin-right:10px;" />
+  <strong>Run Manually</strong>
+</summary>
+
+Manually build and start the Spring application.
+
+</details>
 
 
 
