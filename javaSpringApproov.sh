@@ -7,6 +7,19 @@ BASE_URL="http://localhost:${HOST_PORT}"      # where tests will hit
 WAIT_RETRIES="${WAIT_RETRIES:-40}"            # ~80s (2s * 40)
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
 
+# Check if Colima is running; if not, start it automatically
+if ! colima status >/dev/null 2>&1; then
+  echo "[info] Colima is not running. Starting Colima..."
+  colima start
+  if [ $? -ne 0 ]; then
+    echo "[error] Failed to start Colima. Please start it manually."
+    exit 1
+  fi
+else
+  echo "[info] Colima is already running."
+fi
+
+
 # /* METHODS */
 have() { command -v "$1" >/dev/null 2>&1; }
 die() { echo "ERROR: $*" >&2; exit 1; }
