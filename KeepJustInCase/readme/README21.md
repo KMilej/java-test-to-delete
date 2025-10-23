@@ -72,16 +72,7 @@ It provides a simple example API `api.example.com` that performs Approov token v
 * Gradle version: 7.6.6
 ```
 
-### Table of Contents
-
 ---
-* [Nginx Server](#nginx-server)
-* [Get Up and Running](#get-up-and-running)
-* [Useful Commands](#useful-commands)
-* [Running Automated Tests](#running-automated-tests)
-* [Running Manual Tests](#running-manual-tests)
-* [Troubleshooting](#troubleshooting)
-* [Useful Links](#useful-links)
 
 ### Requirements
 #### Before you start, If you are new to Approov, make sure you have the following:
@@ -289,6 +280,8 @@ curl -X POST http://localhost:8080/approov/enable     # enable the approov servi
 
 curl -X GET http://localhost:8080/approov-state      # check current state
 ```
+
+#### You can rerun the tests with Approov disabled to observe how the application behaves when the Approov service is `no longer active`.
 
 ### Troubleshooting
 - Ensure your Approov account credentials are still configured and valid. Approov credentials typically expire after two hours, so you may need to refresh or re-authenticate before running tests or making API requests.
