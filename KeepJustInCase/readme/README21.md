@@ -54,10 +54,13 @@ The request flow:
 </details>
 
 This `quickstart` implements the [Approov](https://approov.io) server-side request verification code using the Java Spring Boot Framework.
-It provides a simple example API (api.example.com) that performs Approov token verification before allowing requests to access protected endpoints.
+
+Approov provides comprehensive [runtime application self protection](https://approov.io/mobile-app-security/rasp) delivering app attestation, dynamic certificate pinning, runtime secrets protection, and API shielding - all unified across Android, iOS, and HarmonyOS.
+
+It provides a simple example API `api.example.com` that performs Approov token verification before allowing requests to access protected endpoints.
 
 ---
-- The example demonstrates how different API endpoints `/unprotected, /token-check, /token-binding-check, etc.` respond based on the current Approov configuration.
+- The example demonstrates how different API endpoints `/unprotected, /token-check, /token-binding-check, etc.` respond based on the current [Approov configuration](https://ext.approov.io/docs/latest/approov-usage-documentation/#getting-all-api-configuration).
 - Each endpoint reflects whether Approov is enabled or disabled.
 - These endpoints are tested using `curl` requests to observe how the security settings affect the responses.
 
@@ -70,8 +73,9 @@ It provides a simple example API (api.example.com) that performs Approov token v
 * Gradle version: 7.6.6
 ```
 
-### TOC - Table of Contents
+### Table of Contents
 
+---
 * [Nginx Server](#nginx-server)
 * [Get Up and Running](#get-up-and-running)
 * [Useful Commands](#useful-commands)
@@ -92,28 +96,29 @@ It provides a simple example API (api.example.com) that performs Approov token v
 ### Approov Token Verification Flow (Short Version)
 
 1. **Token Request:**  
-   The `Approov SDK` inside the mobile app securely communicates with the `Approov Cloud Service` to obtain a short-lived `Approov Token` (a signed JWT).
+   The `Approov SDK` inside the mobile app securely communicates with the `Approov Cloud Service` to obtain a short-lived [Approov Token](https://ext.approov.io/docs/latest/approov-usage-documentation/#approov-tokens) (a signed JWT).
 
 2. **Token Attachment:**  
    The app attaches this token to every API request using the `Approov-Token` HTTP header.
 
-3. **Server Validation:**  
-   The server verifies the token using the shared `**Approov secret**`, checking its:
+3. [Server Validation:](https://ext.approov.io/docs/latest/approov-usage-documentation/#approov-architecture)
+
+   The server verifies the token using the shared `Approov secret`, checking its:
     - Signature authenticity
     - Expiration (`exp` claim)
     - Other claims if configured
 
-4. **(Optional) Token Binding:**  
-   For extra protection, the app may include an additional `Approov-Token-Binding` header.  
-   This binds the token to specific request data (for example, an access token or session ID).  
-   The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
+4. [(Optional) Token Binding:](https://ext.approov.io/docs/latest/approov-usage-documentation/#token-binding)
+   - For extra protection, the app may include an additional `Approov-Token-Binding` header.  
+   - This binds the token to specific request data (for example, an access token or session ID).  
+   - The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
 
 5. **Request Decision:**
     -  If all checks pass → the request is trusted and processed **`200 OK`**.
     -  If validation fails → the server responds with **`401 Unauthorized`**.
 
 ```json
-"Try It Out Yourself, follow the steps below to run semi-automatically, manually or build and run it automatically using Docker."
+"Try it yourself by following the steps below with any of the available options"
 ```
 
 ---
