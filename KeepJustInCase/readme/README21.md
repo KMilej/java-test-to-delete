@@ -1,15 +1,65 @@
 # Approov Quickstart - Java Spring Token Check
-<b>[Approov](https://approov.io) is an API security solution used to verify that requests received by your backend services originate from trusted versions of your mobile apps.</b>
 
-This repository implements the Approov server-side request verification code using the Java Spring Boot Framework.
+<details>
+  <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
+    <img src="https://approov.io/hs-fs/hubfs/approov%20logo%20300ppi-1.webp?height=80&width=164&name=approov+logo+300ppi-1.webp"
+         width="40"
+         style="background-color:white; padding:4px; border-radius:6px; margin-right:10px;"
+         alt="Approov logo" />
+    <strong>Approov Overview</strong>
+  </summary>
 
-> **NOTE:** It provides a simple example API (api.example.com) that performs Approov token verification before allowing requests to access protected endpoints.
->
->The example demonstrates how different API endpoints `/unprotected, /token-check, /token-binding-check, etc.` respond based on the current Approov configuration.
->
->Each endpoint reflects whether Approov is enabled or disabled.
->
->These endpoints are tested using `curl` requests to observe how the security settings affect the responses.
+<b>[**Approov**](https://approov.io) is an API security solution that verifies whether requests received by your backend services originate from **trusted versions** of your mobile apps.</b>
+
+### Why Approov?
+
+You can learn more about Approov, the motives for adopting it, and more detail on how it works by following this [link](https://approov.io/product). In brief, Approov:
+
+---
+- Ensures that accesses to your API come only from **official app versions**, blocking republished, modified, or tampered ones
+- Protects **sensitive backend data** by preventing API abuse from bots or scripts
+- Secures the communication channel between your app and API using [Approov Dynamic Certificate Pinning](https://approov.io/docs/latest/approov-usage-documentation/#approov-dynamic-pinning), which provides the benefits of traditional pinning without its maintenance drawbacks
+- Removes the need for **API keys** embedded in mobile apps
+- Provides **DoS protection**, mitigating attacks that attempt to exhaust API server resources or degrade service for legitimate users
+
+### How It Works
+
+---
+The following is a high-level overview of how the **Approov Cloud Service** and the **backend server** operate together from a backend perspective.  
+For a full explanation of how the mobile app, backend, and Approov SDK interact, see the [Approov overview page](https://approov.io/product).
+
+### Approov Cloud Service
+
+The Approov Cloud Service attests that a device is running a legitimate and untampered version of your mobile app.
+
+- If the integrity check **passes**, a **valid token** is returned to the app
+- If the integrity check **fails**, a **legitimate-looking (invalid) token** is returned
+
+In either case, the app, unaware of the token's validity, adds it to every request it makes to the Approov protected API(s).
+
+### Backend Server
+
+The backend server verifies that the token supplied in the `Approov-Token` header is both present and valid.  
+Validation is performed using a **shared secret** known only to the Approov Cloud Service and your backend.
+
+The request flow:
+
+- If the Approov Token is **valid**, the request is processed by the API endpoint
+- If the Approov Token is **invalid**, the server returns **HTTP 401 Unauthorized**
+
+> You can choose to log JWT verification failures, but we left it out on purpose so that you can have the choice of how you prefer to do it and decide the right amount of information you want to log. 
+
+
+</details>
+
+This `quickstart` implements the [Approov](https://approov.io) server-side request verification code using the Java Spring Boot Framework.
+It provides a simple example API (api.example.com) that performs Approov token verification before allowing requests to access protected endpoints.
+
+---
+- The example demonstrates how different API endpoints `/unprotected, /token-check, /token-binding-check, etc.` respond based on the current Approov configuration.
+- Each endpoint reflects whether Approov is enabled or disabled.
+- These endpoints are tested using `curl` requests to observe how the security settings affect the responses.
+
 
 ### The quickstart was tested with the following environment:
 ```text
@@ -34,6 +84,9 @@ This repository implements the Approov server-side request verification code usi
 * Approov CLI initialized [Follow the Approov CLI initialization guide](https://ext.approov.io/docs/latest/approov-installation/#initializing-the-approov-cli).
 * [Sign up for the Approov Free Trial](https://approov.io/signup)(no credit card needed)
 * [Get Started with Approov](https://approov.io/product/demo)
+
+
+
 
 ### Approov Token Verification Flow
 
@@ -106,7 +159,7 @@ bash javaSpringApproov.sh
   <strong>Run Semi-Automatically in IDE</strong>
 </summary>
 
-### you should have already:
+### You should have already:
 ```text
 * JVM: 17.0.14
 * Spring Boot version: 2.6.4
@@ -146,7 +199,7 @@ bash testall.sh
   <strong>Run Manually</strong>
 </summary>
 
-### you should have already:
+### You should have already:
 ```text
 * JVM: 17.0.14
 * Spring Boot version: 2.6.4
@@ -174,6 +227,8 @@ set +a  # stop exporting variables
 - The client sends a normal HTTPS request.
 - The server **does not verify** any Approov token or extra authentication header.
 - This means **any client** (even tampered or unauthorized) can call the API if they know the URL.
+
+
 
 ### ===========================================================
 ### 2. Approov Token check
@@ -225,26 +280,14 @@ set +a  # stop exporting variables
 
 The quickstart can be enabled/disabled by running the following commands:
 
-```bash
-curl -X POST http://localhost:8002/admin/approov/disable
+```HTML
+curl -X POST http://localhost:8080/approov/disable    # disable the approov service
 
-curl -X POST http://localhost:8002/admin/approov/enable
+curl -X POST http://localhost:8080/approov/enable     # enable the approov service
+
+curl -X GET http://localhost:8080/approov-state      # check current state
 ```
 
-## Get Up and Running
-
-#### 1. Approov Role should be selected beforehand, an admin role is needed
-
-```bash
-approov role
-```
-
-#### 2. Add your api domain, if not added yet
-
-```bash
-approov api -add example.com 
-approov api -list
-```
 #### 3. Run the automation setup script:
 
 This script will:
@@ -268,6 +311,8 @@ This script will:
 | `401 Unauthorized`      | Token expired or required headers missing                 |
 | `Token looks wrong`     | Use approov token -check <token> to inspect it            |
 | `Wrong secret format`   | Use approov secret -get base64.                           |
+
+Approov Overview
 
 ### Useful Links
 

@@ -49,7 +49,7 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
             Authentication approovAuthentication;
 
             switch (path) {
-                case "/":
+                case "/unprotected":
                 case "/token-check": {
                     // No token binding for these
                     enforceBinding = false;
@@ -58,7 +58,7 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
                     break;
                 }
 
-                case "/token-binding-check": {
+                case "/token-binding-1": {
                     // Single-value token binding (e.g., Authorization header)
                     enforceBinding = true;
                     String single = getSingleBindingValue(request);
@@ -67,8 +67,8 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
                     break;
                 }
 
-                case "/token-binding-check-with-two-values": {
-                    // Double-value token binding: "Authorization==Content-Digest=="
+                case "/token-binding-2": {
+                    // Double-value token binding: "Authorization+Content-Digest"
                     enforceBinding = true;
                     String combined = getCombinedBindingValue(request);
                     approovAuthentication = new ApproovAuthentication(

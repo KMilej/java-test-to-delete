@@ -81,11 +81,11 @@ public class ApiController {
 
     //API Endpoints
 
-    @GetMapping("/")
+    @GetMapping("/unprotected")
     public Map<String, Object> helloV1() {
-        logger.info("Serving request for '/' (unprotected).");
+        logger.info("Serving request for '/unprotected' (unprotected).");
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("details", "unprotected endpoint '/' & no Approov checks performed.");
+        response.put("details", "unprotected endpoint '/unprotected' & no Approov checks performed.");
         response.put("approovEnabled", APPROOV_ENABLED.get());
         response.put("tokenBindingEnabled", TOKEN_BINDING_ENABLED.get());
         return response;
@@ -104,15 +104,15 @@ public class ApiController {
         return response;
     }
 
-    @GetMapping("/token-binding-check")
+    @GetMapping("/token-binding-1")
     public Map<String, Object> tokenBindingCheck(
             @RequestHeader(value = "Authorization", required = true) String authorizationHeader) {
-        logger.info("Serving request for '/token-binding-check'.");
+        logger.info("Serving request for '/token-binding-1'.");
         Map<String, Object> response = new LinkedHashMap<>();
         if (APPROOV_ENABLED.get()) {
-            response.put("details", "endpoint '/token-binding-check' & Approov token valid & Approov checks performed");
+            response.put("details", "endpoint '/token-binding-1' & Approov token valid & Approov checks performed");
         } else {
-            response.put("details", "endpoint '/token-binding-check' & Approov DISABLED — no checks performed");
+            response.put("details", "endpoint '/token-binding-1' & Approov DISABLED — no checks performed");
         }
         response.put("tokenBindingEnabled", TOKEN_BINDING_ENABLED.get());
         response.put("authorizationHeaderPresent",
@@ -120,16 +120,16 @@ public class ApiController {
         return response;
     }
 
-    @GetMapping("/token-binding-check-with-two-values")
+    @GetMapping("/token-binding-2")
     public Map<String, Object> tokenBindingCheckWithTwoValues(
             @RequestHeader(value = "Authorization", required = true) String authorizationHeader,
             @RequestHeader(value = "Content-Digest", required = true) String customHeader) {
-        logger.info("Serving request for '/token-binding-check-with-two-values'.");
+        logger.info("Serving request for '/token-binding-2'.");
         Map<String, Object> response = new LinkedHashMap<>();
         if (APPROOV_ENABLED.get()) {
-            response.put("details", "endpoint '/token-binding-check-with-two-values' & Approov token valid & Approov checks performed");
+            response.put("details", "endpoint '/token-binding-2' & Approov token valid & Approov checks performed");
         } else {
-            response.put("details", "endpoint '/token-binding-check-with-two-values' & Approov DISABLED — no checks performed");
+            response.put("details", "endpoint '/token-binding-2' & Approov DISABLED — no checks performed");
         }
         response.put("tokenBindingEnabled", TOKEN_BINDING_ENABLED.get());
         response.put("authorizationHeaderPresent",

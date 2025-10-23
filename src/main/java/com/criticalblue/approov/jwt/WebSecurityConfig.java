@@ -76,12 +76,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                         .antMatchers(HttpMethod.GET, "/**").authenticated();authenticated
                     .authorizeRequests()
                     // public root
-                    .antMatchers("/").permitAll()
+                    .antMatchers("/unprotected").permitAll()
                     // require Approov token (and binding/signing enforced by your Approov components/config)
                     .antMatchers("/token-check").authenticated()
-                    .antMatchers("/token-binding-check").authenticated()
+                    .antMatchers("/token-binding-1").authenticated()
                     .antMatchers("/message-signing-check").authenticated()
-                    .antMatchers("/token-binding-check-with-two-values").authenticated();
+                    .antMatchers("/token-binding-2").authenticated();
                     // anything else is denied (optional but good practice)
                     //.anyRequest().denyAll();
         }

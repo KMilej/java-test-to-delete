@@ -3,7 +3,7 @@ set -euo pipefail  # fail on error, undefined variable, or pipe failure
 
 # Test of DOCKER
 
-BASE_URL="${BASE_URL:-http://localhost:8002}"
+BASE_URL="${BASE_URL:-http://localhost:8080/unprotected}"
 
 # Wait for app to be ready
 echo "[wait] Checking $BASE_URL ..."
@@ -17,17 +17,17 @@ for i in {1..30}; do
 done
 
 # --- Config ---
-BASE_URL="http://localhost:8002"
-URL_ROOT="${BASE_URL}"
+BASE_URL="http://localhost:8080"
+URL_ROOT="${BASE_URL}/unprotected"
 URL_TOKEN_CHECK="${BASE_URL}/token-check"
-URL_TOKEN_BINDING_CHECK="${BASE_URL}/token-binding-check"
-URL_TOKEN_BINDING_CHECK_TWO_VALUE="${BASE_URL}/token-binding-check-with-two-values"
+URL_TOKEN_BINDING_CHECK="${BASE_URL}/token-binding-1"
+URL_TOKEN_BINDING_CHECK_TWO_VALUE="${BASE_URL}/token-binding-2"
 
 # Endpoint descriptions (for readable output)
-DESC_ROOT="endpoint /"
+DESC_ROOT="endpoint /unprotected"
 DESC_TOKEN_CHECK="endpoint /token-check"
-DESC_TOKEN_BINDING_CHECK="endpoint /token-binding-check"
-DESC_TOKEN_BINDING_CHECK_TWO_VALUE="endpoint /token-binding-check-with-two-values"
+DESC_TOKEN_BINDING_CHECK="endpoint /token-binding-1"
+DESC_TOKEN_BINDING_CHECK_TWO_VALUE="endpoint /token-binding-2"
 
 # --- Helpers --- check if curl, grep, approov exist
 require_cmd() {
