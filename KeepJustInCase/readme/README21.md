@@ -9,6 +9,7 @@
     <strong>Approov Overview</strong>
   </summary>
 
+---
 <b>[**Approov**](https://approov.io) is an API security solution that verifies whether requests received by your backend services originate from **trusted versions** of your mobile apps.</b>
 
 ### Why Approov?
@@ -48,7 +49,7 @@ The request flow:
 - If the Approov Token is **invalid**, the server returns **HTTP 401 Unauthorized**
 
 > You can choose to log JWT verification failures, but we left it out on purpose so that you can have the choice of how you prefer to do it and decide the right amount of information you want to log. 
-
+---
 
 </details>
 
@@ -88,7 +89,7 @@ It provides a simple example API (api.example.com) that performs Approov token v
 
 
 
-### Approov Token Verification Flow
+### Approov Token Verification Flow (Short Version)
 
 1. **Token Request:**  
    The `Approov SDK` inside the mobile app securely communicates with the `Approov Cloud Service` to obtain a short-lived `Approov Token` (a signed JWT).
