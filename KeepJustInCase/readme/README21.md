@@ -6,7 +6,7 @@
          width="40"
          style="background-color:white; padding:4px; border-radius:6px; margin-right:10px;"
          alt="Approov logo" />
-    <strong>Approov Overview</strong>
+    <strong>Click “Approov Overview” for more details</strong>
   </summary>
 
 ---
@@ -64,7 +64,6 @@ It provides a simple example API `api.example.com` that performs Approov token v
 - Each endpoint reflects whether Approov is enabled or disabled.
 - These endpoints are tested using `curl` requests to observe how the security settings affect the responses.
 
-
 ### The quickstart was tested with the following environment:
 ```text
 * Operating System: macOS 15.6.1 (Sequoia)
@@ -89,8 +88,6 @@ It provides a simple example API `api.example.com` that performs Approov token v
 * Approov CLI initialized [Follow the Approov CLI initialization guide](https://ext.approov.io/docs/latest/approov-installation/#initializing-the-approov-cli).
 * [Sign up for the Approov Free Trial](https://approov.io/signup)(no credit card needed)
 * [Get Started with Approov](https://approov.io/product/demo)
-
-
 
 
 ### Approov Token Verification Flow (Short Version)
@@ -126,7 +123,7 @@ It provides a simple example API `api.example.com` that performs Approov token v
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
   <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" width="40" style="vertical-align:middle; margin-right:10px;" />
-  <strong>Run with Docker</strong>
+  <strong>Run Using Docker</strong>
 </summary>
 
 ## Requirements
@@ -155,6 +152,12 @@ If you have all requirements installed, you can build and run the example inside
 bash javaSpringApproov.sh
 ```
 
+This script will:
+- Checks environment requirements - verifies that Approov CLI, Docker, Docker Compose v2, and Colima are installed and running.
+- Builds and starts containers – runs docker compose up -d --build to build the image and launch the Spring Boot application in the background.
+- Runs approov-test.sh – executes all endpoint tests `unprotected (no headers)` `token-check (with Approov-Token)` `token-binding (with Approov-Token + Authorization header`
+- Displays results and stops containers when finished.
+
 </details>
 
 ---
@@ -162,7 +165,7 @@ bash javaSpringApproov.sh
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
   <img src="https://cdn-icons-png.flaticon.com/512/3097/3097412.png" width="40" style="vertical-align:middle; margin-right:10px;" />
-  <strong>Run Semi-Automatically in IDE</strong>
+  <strong>Run in IDE (Automatic)</strong>
 </summary>
 
 ### You should have already:
@@ -193,7 +196,10 @@ set +a  # stop exporting variables
 bash testall.sh
 ```
 
-
+This script will:
+- Checks Approov authentication and required tools — verifies that approov and curl are available, and confirms Approov CLI login works.
+- tests Approov state and setup — calls /approov-state to detect whether token checking is enabled or disabled.
+- Runs endpoint tests — performs HTTP requests for: `/unprotected (no token), /token-check (valid/invalid tokens), /token-binding-1 and /token-binding-2 (with bound headers like Authorization and Content-Digest).`
 
 </details>
 
@@ -202,7 +208,7 @@ bash testall.sh
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
   <img src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png" width="40" style="vertical-align:middle; margin-right:10px;" />
-  <strong>Run Manually</strong>
+  <strong>Run in IDE (Manual Setup)</strong>
 </summary>
 
 ### You should have already:
@@ -233,8 +239,6 @@ set +a  # stop exporting variables
 - The client sends a normal HTTPS request.
 - The server **does not verify** any Approov token or extra authentication header.
 - This means **any client** (even tampered or unauthorized) can call the API if they know the URL.
-
-
 
 ### ===========================================================
 ### 2. Approov Token check
@@ -270,17 +274,9 @@ set +a  # stop exporting variables
 - Both are included in the hash inside the Approov token. This means the server verifies a single hash that covers both authentication credentials.
 - **Use case:** This configuration provides the highest level of protection for authenticated API requests:
 
-
-
-
-
 </details>
 
 ---
-
-
-
-## Useful Commands
 
 ### Disable or enable the approov service
 
@@ -294,20 +290,7 @@ curl -X POST http://localhost:8080/approov/enable     # enable the approov servi
 curl -X GET http://localhost:8080/approov-state      # check current state
 ```
 
-#### 3. Run the automation setup script:
-
-This script will:
-* Run the api command list, to ensure user is logged in.
-* Build the Docker image.
-* Run a container using the image. The script maps docker volumes with the server
-  nginx config and required lua code. It uses the default host port 8111 to
-  expose the nginx server.
-
-**NOTE:** If user is not logged in yet, approov cli will prompt the user to enter their password. If the user is logged in, then user will see a list of api domains.
-
-
 ### Troubleshooting
-- [Check approov service is enabled or reload the server](#useful-commands)
 - Ensure your Approov account credentials are still configured and valid. Approov credentials typically expire after two hours, so you may need to refresh or re-authenticate before running tests or making API requests.
 
 | Problem                 | Likely Cause                                              |
@@ -318,7 +301,9 @@ This script will:
 | `Token looks wrong`     | Use approov token -check <token> to inspect it            |
 | `Wrong secret format`   | Use approov secret -get base64.                           |
 
-Approov Overview
+## Issues
+
+If you find any issue while following our instructions then just report it [here](https://github.com/approov/quickstart-java-spring-token-check/issues), with the steps to reproduce it, and we will sort it out and/or guide you to the correct path.
 
 ### Useful Links
 
@@ -333,5 +318,4 @@ Approov Overview
 * [About Us](https://approov.io/company)
 * [Contact Us](https://approov.io/contact)
 
-[Back to Table of Contents](#toc---table-of-contents)
 
