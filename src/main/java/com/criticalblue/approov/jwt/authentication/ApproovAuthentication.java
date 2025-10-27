@@ -34,16 +34,6 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
     /** NEW: whether to enforce token binding for THIS request */
     private final boolean enforceBinding;
 
-    /** Without binding (default) */
-    public ApproovAuthentication(ApproovConfig approovConfig, String approovToken) {
-        this(approovConfig, approovToken, null, false);
-    }
-
-    /** With binding (enabled by default when a header is provided) */
-    public ApproovAuthentication(ApproovConfig approovConfig, String approovToken, String tokenBindingHeader) {
-        this(approovConfig, approovToken, tokenBindingHeader, true);
-    }
-
     /** Main constructor – explicitly controls enforceBinding */
     public ApproovAuthentication(ApproovConfig approovConfig, String approovToken,
                                  String tokenBindingHeader, boolean enforceBinding) {
