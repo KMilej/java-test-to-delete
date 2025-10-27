@@ -155,7 +155,7 @@ This script will:
 
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
-  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%23f2f2f2' stroke='%23ccc' stroke-width='1'/><text x='50%25' y='50%25' font-family='Arial, Helvetica, sans-serif' font-size='16' font-weight='700' fill='%23333' text-anchor='middle' dominant-baseline='central'>IDE</text></svg>" width="40" style="vertical-align:middle; margin-right:10px;" alt="IDE logo">
+   <img src="https://img.shields.io/badge/IDE-gray?style=for-the-badge&logoColor=white" width="40" style="vertical-align:middle; margin-right:10px;" />
   <strong>Run in IDE (Automatic)</strong>
 </summary>
 
@@ -174,6 +174,15 @@ This script will:
 ./gradlew build
 ```
 
+#### Environment Setup Script — `set-approov-secret.sh`
+```bash
+bash set-approov-secret.sh
+```
+
+What is does:
+- Creates the `.env` file automatically if `.env does not exist, the script copies it from `.env.example`.
+- Run `approov secret -get base64` to retrieve the Approov secret from the Approov CLI and sets it in the `.env` file.
+- Registers the domain api.example.com in the Approov cloud configuration so it can be protected by Approov.
 ```bash
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
@@ -197,7 +206,7 @@ This script will:
 
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
- <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%23f2f2f2' stroke='%23ccc' stroke-width='1'/><text x='50%25' y='50%25' font-family='Arial, Helvetica, sans-serif' font-size='16' font-weight='700' fill='%23333' text-anchor='middle' dominant-baseline='central'>IDE</text></svg>" width="40" style="vertical-align:middle; margin-right:10px;" alt="IDE logo">
+  <img src="https://img.shields.io/badge/IDE-gray?style=for-the-badge&logoColor=white" width="40" style="vertical-align:middle; margin-right:10px;" />
  <strong>Run in IDE (Manual Setup)</strong>
 </summary>
 
@@ -216,7 +225,20 @@ This script will:
 ./gradlew build
 ```
 
+#### Create a .env file in the project root by :
+```bash
+cp .env.example .env
+```
+#### Generate a new Approov secret and add it to the `.env` file in `APPROOV_BASE64_SECRET=` by use CLI command:
+```bash
+approov secret -get base64
+```
+#### Register the API domain `api.example.com` with the Approov CLI by:
+```bash
+approov api -add api.example.com
+```
 
+#### Finally, run the Spring Boot application with:
 ```bash
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
@@ -231,6 +253,18 @@ set +a  # stop exporting variables
 - The server **does not verify** any Approov token or extra authentication header.
 - This means **any client** (even tampered or unauthorized) can call the API if they know the URL.
 
+#### The following example shows how the API responds when no Approov protection is applied.
+```bash
+curl -X GET http://localhost:8080/unprotected
+```
+
+The response will be a `200` for request:
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-cache
+```
+
 ### ===========================================================
 ### 2. Approov Token check
 ### ===========================================================
@@ -243,6 +277,29 @@ set +a  # stop exporting variables
 - If invalid → server returns **`401 Unauthorized`**.
 - **Purpose**: Protect API endpoints so that only authentic, unmodified Approov-integrated apps can access them.
 
+####  The following example shows how the API responds when an Approov token is required.
+
+#### Valid Approov Token request:
+```bash
+approov token -genExample api.example.com
+```
+
+#### Use the generated token in the `Approov-Token` header and /token-check endpoint. 
+```bash
+curl -X GET http://localhost:8080/token-check \
+     -H "Approov-Token: <valid_approov_token_here>"
+```
+
+The response will be a `200` for request:
+
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-cache
+```
+
+#### If you use an invalid or missing token, the server will respond with `401 Unauthorized`.
+
 ### ===========================================================
 ### 3. Approov Token Binding check
 ### ===========================================================
@@ -254,6 +311,31 @@ set +a  # stop exporting variables
 - Prevents token replay — the Approov token **cannot be reused or stolen** for another session.
 - **Use case:** stronger protection for **authenticated API calls** tied to a specific user or device.
 
+#### The following example shows how the API responds when an Approov token with binding is required.
+
+#### Generate a valid Approov Token with binding:
+```bash
+approov token -setDataHashInToken your-custom-name -genExample api.example.com
+```
+
+#### Use the generated token with binding in the Approov-Token and Authorization headers when calling the /token-binding-1 endpoint.
+
+```bash
+curl -X GET http://localhost:8080/token-binding-1 \
+     -H "Approov-Token: <valid_approov_token_here>" \
+     -H "Authorization: <your-custom-name>"
+```
+
+The response will be a `200` for request:
+
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-cache
+```
+
+#### If you use an invalid or missing header or token, the server will respond with `401 Unauthorized`. 
+
 ### ===========================================================
 ### 3. Approov Token Binding check with two different bound values
 ### ===========================================================
@@ -264,6 +346,32 @@ set +a  # stop exporting variables
     - **`Content-Digest`** It is combined with the `Authorization` header to create a stronger binding.
 - Both are included in the hash inside the Approov token. This means the server verifies a single hash that covers both authentication credentials.
 - **Use case:** This configuration provides the highest level of protection for authenticated API requests:
+
+#### The following example shows how the API responds when an Approov token with two bindings is required.
+
+#### Generate a valid Approov Token with two binding:
+```bash
+approov token -setDataHashInToken ExampleAuthToken==ContentDigest== -genExample api.example.com
+```
+
+#### Use the generated token with two binding in the Approov-Token and Authorization headers when calling the /token-binding-2 endpoint.
+
+```bash
+curl -X GET http://localhost:8080/token-binding-2 \
+     -H "Approov-Token: <valid_approov_token_here>" \
+     -H "Authorization: ExampleAuthToken==" \
+     -H "Content-Digest: ContentDigest=="
+```
+
+The response will be a `200` for request:
+
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-cache
+```
+
+#### If you use an invalid or missing header or token, the server will respond with `401 Unauthorized`.
 
 </details>
 
