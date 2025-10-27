@@ -155,7 +155,7 @@ This script will:
 
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
-  <img src="https://cdn-icons-png.flaticon.com/512/3097/3097412.png" width="40" style="vertical-align:middle; margin-right:10px;" />
+  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%23f2f2f2' stroke='%23ccc' stroke-width='1'/><text x='50%25' y='50%25' font-family='Arial, Helvetica, sans-serif' font-size='16' font-weight='700' fill='%23333' text-anchor='middle' dominant-baseline='central'>IDE</text></svg>" width="40" style="vertical-align:middle; margin-right:10px;" alt="IDE logo">
   <strong>Run in IDE (Automatic)</strong>
 </summary>
 
@@ -165,7 +165,6 @@ This script will:
 * Spring Boot version: 2.6.4
 * Gradle version: 7.6.6
 * Approov CLI initialized
-
 ```
 
 #### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
@@ -198,8 +197,8 @@ This script will:
 
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
-  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png" width="40" style="vertical-align:middle; margin-right:10px;" />
-  <strong>Run in IDE (Manual Setup)</strong>
+ <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%23f2f2f2' stroke='%23ccc' stroke-width='1'/><text x='50%25' y='50%25' font-family='Arial, Helvetica, sans-serif' font-size='16' font-weight='700' fill='%23333' text-anchor='middle' dominant-baseline='central'>IDE</text></svg>" width="40" style="vertical-align:middle; margin-right:10px;" alt="IDE logo">
+ <strong>Run in IDE (Manual Setup)</strong>
 </summary>
 
 ### You should have already:
@@ -216,6 +215,7 @@ This script will:
 ```bash
 ./gradlew build
 ```
+
 
 ```bash
 set -a  # auto-export all assignments
