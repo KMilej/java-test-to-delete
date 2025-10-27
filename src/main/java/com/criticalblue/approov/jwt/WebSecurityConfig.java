@@ -49,14 +49,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http.cors();
 
             http
-// *** COMMENT THE LINE BELOW FOR APPROOV ***
              //.authorizeRequests().antMatchers("/**").permitAll().and()
                     .httpBasic().disable()
                     .formLogin().disable()
                     .logout().disable()
                     .csrf().disable()
 
-// *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
 
                     // @APPROOV The Approov Token check is triggered here.
                     .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
