@@ -29,7 +29,7 @@ services:
     volumes:
       - ./:/workspace
     entrypoint: [ "bash", "-lc" ]
-    command: [ "./testall.sh" ]
+    command: [ "./tests-approov.sh" ]
 
 volumes:
   gradle-cache:

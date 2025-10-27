@@ -78,7 +78,7 @@ wait_for_app() {
 
 run_tests_host() {
   info "Running tests on host (not in container)…"
-  BASE_URL="${BASE_URL}" bash ./testall.sh
+  BASE_URL="${BASE_URL}" bash ./tests-approov.sh
   info "Tests finished ✅"
 }
 
