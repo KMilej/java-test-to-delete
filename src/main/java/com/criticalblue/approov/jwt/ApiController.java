@@ -28,9 +28,10 @@ public class ApiController {
         return TOKEN_BINDING_ENABLED.get();
     }
 
+
     //Admin Endpoints
 
-    @GetMapping("/admin/approov/status")
+    @GetMapping("/approov-state")
     public Map<String, Object> approovStatus() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("approovEnabled", APPROOV_ENABLED.get());
@@ -38,7 +39,7 @@ public class ApiController {
         return response;
     }
 
-    @PostMapping("/admin/approov/enable")
+    @PostMapping("/approov/enable")
     public Map<String, Object> approovEnable() {
         Map<String, Object> response = new LinkedHashMap<>();
         APPROOV_ENABLED.set(true);
@@ -46,7 +47,7 @@ public class ApiController {
         return response;
     }
 
-    @PostMapping("/admin/approov/disable")
+    @PostMapping("/approov/disable")
     public Map<String, Object> approovDisable() {
         Map<String, Object> response = new LinkedHashMap<>();
         APPROOV_ENABLED.set(false);
@@ -54,7 +55,7 @@ public class ApiController {
         return response;
     }
 
-    @PostMapping("/admin/approov/toggle")
+    @PostMapping("/approov/toggle")
     public Map<String, Object> approovToggle() {
         Map<String, Object> response = new LinkedHashMap<>();
         boolean newVal = !APPROOV_ENABLED.get();
@@ -63,7 +64,7 @@ public class ApiController {
         return response;
     }
 
-    @PostMapping("/admin/token-binding/enable")
+    @PostMapping("/token-binding/enable")
     public Map<String, Object> tbEnable() {
         Map<String, Object> response = new LinkedHashMap<>();
         TOKEN_BINDING_ENABLED.set(true);
@@ -71,7 +72,7 @@ public class ApiController {
         return response;
     }
 
-    @PostMapping("/admin/token-binding/disable")
+    @PostMapping("/token-binding/disable")
     public Map<String, Object> tbDisable() {
         Map<String, Object> response = new LinkedHashMap<>();
         TOKEN_BINDING_ENABLED.set(false);
@@ -106,7 +107,7 @@ public class ApiController {
 
     @GetMapping("/token-binding-1")
     public Map<String, Object> tokenBindingCheck(
-            @RequestHeader(value = "Authorization", required = true) String authorizationHeader) {
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         logger.info("Serving request for '/token-binding-1'.");
         Map<String, Object> response = new LinkedHashMap<>();
         if (APPROOV_ENABLED.get()) {
@@ -122,8 +123,8 @@ public class ApiController {
 
     @GetMapping("/token-binding-2")
     public Map<String, Object> tokenBindingCheckWithTwoValues(
-            @RequestHeader(value = "Authorization", required = true) String authorizationHeader,
-            @RequestHeader(value = "Content-Digest", required = true) String customHeader) {
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @RequestHeader(value = "Content-Digest", required = false) String customHeader) {
         logger.info("Serving request for '/token-binding-2'.");
         Map<String, Object> response = new LinkedHashMap<>();
         if (APPROOV_ENABLED.get()) {

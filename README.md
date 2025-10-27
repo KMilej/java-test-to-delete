@@ -78,7 +78,6 @@ It provides a simple example API `api.example.com` that performs Approov token v
 #### Before you start, If you are new to Approov, make sure you have the following:
 * Approov CLI initialized [Follow the Approov CLI initialization guide](https://ext.approov.io/docs/latest/approov-installation/#initializing-the-approov-cli).
 * [Sign up for the Approov Free Trial](https://approov.io/signup)(no credit card needed)
-* [Get Started with Approov](https://approov.io/product/demo)
 
 
 ### Approov Token Verification Flow (Short Version)
@@ -408,8 +407,6 @@ If you find any issue while following our instructions then just report it [here
 
 ### Useful Links
 
-* [Approov Free Trial](https://approov.io/signup)(no credit card needed)
-* [Approov Get Started](https://approov.io/product/demo)
 * [Approov QuickStarts](https://approov.io/docs/latest/approov-integration-examples/)
 * [Approov Docs](https://approov.io/docs)
 * [Approov Blog](https://approov.io/blog/)

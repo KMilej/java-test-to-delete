@@ -46,42 +46,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
 
-            http.cors();
-
-            http
-             //.authorizeRequests().antMatchers("/**").permitAll().and()
+            http.cors().and()
                     .httpBasic().disable()
                     .formLogin().disable()
                     .logout().disable()
                     .csrf().disable()
-
-
-                    // @APPROOV The Approov Token check is triggered here.
                     .authenticationProvider(new ApproovAuthenticationProvider(approovConfig))
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-            http
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
                     .securityContext()
-                    // @APPROOV The Approov Token check is configured here.
                     .securityContextRepository(new ApproovSecurityContextRepository(approovConfig))
                     .and()
                     .exceptionHandling()
                     .authenticationEntryPoint(new ApproovAuthenticationEntryPoint())
                     .and()
-                    // @APPROOV This matcher will require the Approov token for all API endpoints.
-//                     .antMatcher("/")
-//                         .authorizeRequests()
-//                         .antMatchers(HttpMethod.GET, "/**").authenticated();authenticated
                     .authorizeRequests()
-                    // public root
+                    // public
                     .antMatchers("/unprotected").permitAll()
-                    // require Approov token (and binding/signing enforced by your Approov components/config)
+                    .antMatchers("/approov-state", "/approov/enable", "/approov/disable", "/approov/toggle").permitAll()
+                    // secured (will still 200 when Approov is OFF due to dummy auth)
                     .antMatchers("/token-check").authenticated()
                     .antMatchers("/token-binding-1").authenticated()
+                    .antMatchers("/token-binding-2").authenticated()
                     .antMatchers("/message-signing-check").authenticated()
-                    .antMatchers("/token-binding-2").authenticated();
-                    // anything else is denied (optional but good practice)
-                    //.anyRequest().denyAll();
+            // everything else denied (optional but recommended)
+            //.anyRequest().denyAll()
+            ;
         }
+
     }
-}
+    }

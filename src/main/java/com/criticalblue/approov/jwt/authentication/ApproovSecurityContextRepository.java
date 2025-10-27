@@ -4,20 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.criticalblue.approov.jwt.ApiController;
-import com.criticalblue.approov.jwt.WebSecurityConfig;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // <-- ADD
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 
-/**
- * Sets up the Approov Authentication in the Spring SecurityContext.
- * Decides per-endpoint whether token binding is enforced and, for /token-binding-2,
- * composes a double-value binding (Authorization + Content-Digest).
- *
- * @see WebSecurityConfig
- */
+import java.util.Collections; // <-- ADD
+
 public class ApproovSecurityContextRepository implements SecurityContextRepository {
 
     private final ApproovConfig approovConfig;
@@ -31,75 +26,66 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         HttpServletRequest request = requestResponseHolder.getRequest();
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        if (ApiController.isApproovEnabled()) {
+        // ─────────────────────────────────────────────────────────────────────
+        // NEW: When Approov is disabled, auto-authenticate everything so
+        // secured endpoints still return 200 and controller can show "skipped".
+        // ─────────────────────────────────────────────────────────────────────
+        if (!ApiController.isApproovEnabled()) {
+            var dummy = new UsernamePasswordAuthenticationToken("approov-disabled", null, Collections.emptyList());
+            context.setAuthentication(dummy);
+            return context;
+        }
 
 
-            // 1) Read Approov-Token (name is configurable in ApproovConfig)
-            String approovToken = request.getHeader(approovConfig.getApproovHeaderName());
-            if (approovToken == null) {
-                // No token -> leave context empty; protected endpoints will be rejected later.
-                return context;
+        // Approov enabled → proceed with normal flow
+        String approovToken = request.getHeader(approovConfig.getApproovHeaderName());
+        if (approovToken == null) {
+            // No token -> leave context empty; protected endpoints will be rejected later.
+            return context;
+        }
+
+        String path = request.getRequestURI();
+        if (path == null) path = "";
+
+        Authentication approovAuthentication;
+        switch (path) {
+            case "/unprotected":
+            case "/token-check": {
+                approovAuthentication = new ApproovAuthentication(
+                        approovConfig, approovToken, null, false);
+                break;
             }
-
-            // 2) Decide per endpoint
-            String path = request.getRequestURI();
-            if (path == null) path = "";
-
-            boolean enforceBinding;
-            Authentication approovAuthentication;
-
-            switch (path) {
-                case "/unprotected":
-                case "/token-check": {
-                    // No token binding for these
-                    enforceBinding = false;
-                    approovAuthentication = new ApproovAuthentication(
-                            approovConfig, approovToken, null, false);
-                    break;
-                }
-
-                case "/token-binding-1": {
-                    // Single-value token binding (e.g., Authorization header)
-                    enforceBinding = true;
+            case "/token-binding-1": {
+                String single = getSingleBindingValue(request);
+                approovAuthentication = new ApproovAuthentication(
+                        approovConfig, approovToken, single, true);
+                break;
+            }
+            case "/token-binding-2": {
+                String combined = getCombinedBindingValue(request);
+                approovAuthentication = new ApproovAuthentication(
+                        approovConfig, approovToken, combined, true);
+                break;
+            }
+            default: {
+                // FIX: use the proper accessor, not the misspelled field
+                boolean enforceBinding = ApiController.isTokenBindingEnabled();
+                if (enforceBinding) {
                     String single = getSingleBindingValue(request);
                     approovAuthentication = new ApproovAuthentication(
                             approovConfig, approovToken, single, true);
-                    break;
-                }
-
-                case "/token-binding-2": {
-                    // Double-value token binding: "Authorization+Content-Digest"
-                    enforceBinding = true;
-                    String combined = getCombinedBindingValue(request);
+                } else {
                     approovAuthentication = new ApproovAuthentication(
-                            approovConfig, approovToken, combined, true);
-                    break;
+                            approovConfig, approovToken, null, false);
                 }
-
-                default: {
-                    // Fallback to global toggle
-                    enforceBinding = ApiController.isTokenBindingEnebled;
-                    if (enforceBinding) {
-                        String single = getSingleBindingValue(request);
-                        approovAuthentication = new ApproovAuthentication(
-                                approovConfig, approovToken, single, true);
-                    } else {
-                        approovAuthentication = new ApproovAuthentication(
-                                approovConfig, approovToken, null, false);
-                    }
-                    break;
-                }
+                break;
             }
-
-            // 3) Put into context
-            context.setAuthentication(approovAuthentication);
-            return context;
         }
-        return org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+
+        context.setAuthentication(approovAuthentication);
+        return context;
     }
-    /**
-     * Single-value binding: read the header configured in ApproovConfig (e.g., "Authorization").
-     */
+
     private String getSingleBindingValue(HttpServletRequest request) {
         final String headerName = approovConfig.getApproovTokenBindingHeaderName(); // e.g. "Authorization"
         if (headerName == null) return null;
@@ -107,32 +93,22 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         return value == null ? null : value.trim();
     }
 
-    /**
-     * Double-value binding for /token-binding-2:
-     * Must MATCH EXACTLY the CLI input used in:
-     *   approov token -setDataHashInToken "AuthorizationValue==ContentDigestValue==" -genExample <aud>
-     */
     private String getCombinedBindingValue(HttpServletRequest request) {
         String auth = trimOrNull(request.getHeader("Authorization"));
         String digest = trimOrNull(request.getHeader("Content-Digest"));
         if (auth == null || digest == null) return null;
-
-        // EXACT same bytes as you pass to -setDataHashInToken:
-        return auth + digest; // no extra "==" added here
+        return auth + digest; // must match bytes used with -setDataHashInToken
     }
 
     private String trimOrNull(String v) {
         return v == null ? null : v.trim();
     }
 
-    @Override
-    public void saveContext(SecurityContext context, HttpServletRequest request, HttpServletResponse response) {
-        // Stateless: nothing to save
-    }
-
+    @Override public void saveContext(SecurityContext context, HttpServletRequest request, HttpServletResponse response) {}
     @Override
     public boolean containsContext(HttpServletRequest request) {
-        // Safer for concurrency: read directly from request
-        return request.getHeader(approovConfig.getApproovHeaderName()) != null;
+        return !ApiController.isApproovEnabled()
+                || request.getHeader(approovConfig.getApproovHeaderName()) != null;
     }
+
 }
