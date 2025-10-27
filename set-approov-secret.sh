@@ -7,7 +7,17 @@ set -euo pipefail
 ENV_FILE="${1:-.env}"
 
 # Ensure the .env file exists
-[[ -f "$ENV_FILE" ]] || touch "$ENV_FILE"
+# If .env does not exist, copy from .env.example
+if [[ ! -f "$ENV_FILE" ]]; then
+  if [[ -f ".env.example" ]]; then
+    cp .env.example "$ENV_FILE"
+    echo " Created ${ENV_FILE} from .env.example"
+  else
+    echo "⚠  No ${ENV_FILE} or .env.example found. Creating an empty ${ENV_FILE}."
+    touch "$ENV_FILE"
+  fi
+fi
+
 
 # Run the Approov CLI and capture only the Base64 secret (ignore the "note" line)
 SECRET="$(
@@ -22,6 +32,7 @@ if [[ -z "$SECRET" ]]; then
   echo " Run 'approov whoami' to verify your login/profile before retrying."
   exit 1
 fi
+
 
 # Escape quotes (just in case)
 SECRET_ESCAPED="${SECRET//\"/\\\"}"
