@@ -404,13 +404,13 @@ curl -X GET http://localhost:8080/approov-state      # check current state
 ### Troubleshooting
 - Ensure your Approov account credentials are still configured and valid. Approov credentials typically expire after two hours, so you may need to refresh or re-authenticate before running tests or making API requests.
 
-| Problem                 | Likely Cause                                              |
-| ----------------------- | --------------------------------------------------------- |
-| `Invalid Token`         | Secret mismatch or hash mismatch in pay claim             |
-| `Signature mismatch`    | Token's `pay` doesn't match the hash of Authorization     |
-| `401 Unauthorized`      | Token expired or required headers missing                 |
-| `Token looks wrong`     | Use approov token -check <token> to inspect it            |
-| `Wrong secret format`   | Use approov secret -get base64.                           |
+| Problem                 | Likely Cause                                                      |
+| ----------------------- |-------------------------------------------------------------------|
+| `Invalid Token`         | Secret mismatch or hash mismatch in pay claim                     |
+| `Signature mismatch`    | Token signature doesn’t match expected HMAC (wrong key)           |
+| `401 Unauthorized`      | Token expired, missing, or required headers not included          |
+| `Token looks wrong`     | Use approov token -check <token> to inspect it                    |
+| `Wrong secret format`   | Use approov secret -get base64.                                   |
 
 ## Issues
 
