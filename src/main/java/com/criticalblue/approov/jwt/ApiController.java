@@ -32,11 +32,15 @@ public class ApiController {
     //Admin Endpoints
 
     @GetMapping("/approov-state")
-    public Map<String, Object> approovStatus() {
+    public ResponseEntity<Map<String, Object>> approovStatus() {
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("approovEnabled", APPROOV_ENABLED.get());
+        boolean enabled = APPROOV_ENABLED.get();
+        response.put("approovEnabled", enabled);
         response.put("tokenBindingEnabled", TOKEN_BINDING_ENABLED.get());
-        return response;
+        logger.info("Returning status code: {} | Approov State checked: approovEnabled={}, TokenBindingEnabled={}", enabled ? 200 : 503, enabled, TOKEN_BINDING_ENABLED.get());
+        return enabled
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(503).body(response);
     }
 
     @PostMapping("/approov/enable")

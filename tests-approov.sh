@@ -9,7 +9,7 @@ BASE_URL="${BASE_URL:-http://localhost:8080/unprotected}"
 echo "[wait] Checking $BASE_URL ..."
 for i in {1..30}; do
   if curl -sf "$BASE_URL/" >/dev/null 2>&1; then
-    echo "[ok] App is ready!"
+    echo " App is ready!"
     break
   fi
   echo "[wait] still starting..."

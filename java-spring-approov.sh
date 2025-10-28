@@ -66,7 +66,7 @@ wait_for_app() {
   info "Waiting for ${BASE_URL}/ to respond…"
   for i in $(seq 1 "$WAIT_RETRIES"); do
     if curl -sf "${BASE_URL}/" >/dev/null 2>&1; then
-      info "App is up ✅"
+      info "App is up "
       return 0
     fi
     printf "[wait] attempt %d/%d\r" "$i" "$WAIT_RETRIES"
@@ -79,7 +79,7 @@ wait_for_app() {
 run_tests_host() {
   info "Running tests on host (not in container)…"
   BASE_URL="${BASE_URL}" bash ./tests-approov.sh
-  info "Tests finished ✅"
+  info "Tests finished "
 }
 
 # -------- main --------
