@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# show Approov API domains
+approov api -list || true
 
-# FIX: HOST_PORT should be just the port, not include a path
 HOST_PORT="${HOST_PORT:-8080}"
 BASE_URL="http://localhost:${HOST_PORT}"
 WAIT_RETRIES="${WAIT_RETRIES:-40}"
@@ -39,7 +40,7 @@ ensure_docker_v2() {
     die "Docker CLI is not installed or not in PATH. Docker (CLI + running Engine/daemon) is REQUIRED."
   fi
 
-  # 2) 'docker compose' (v2) available as a subcommand?
+  # 2) 'docker compose' (v2)
   if ! docker compose version >/dev/null 2>&1; then
     die "'docker compose' (Docker Compose v2) is not available. Install the Compose v2 plugin or use Docker Desktop, which bundles it."
   fi
@@ -74,6 +75,21 @@ wait_for_app() {
   die "Service not responding on ${BASE_URL}/"
 }
 
+run_set_secret_api() {
+  info "Running set-secret-api.sh…"
+
+  # ensure file exists, fix line endings, ensure exec bit
+  [[ -f ./set-secret-api.sh ]] || die "set-secret-api.sh not found in $(pwd)"
+  sed -i 's/\r$//' ./set-secret-api.sh || true
+  chmod +x ./set-secret-api.sh || true
+
+  # pass env needed by the script; enable trace for visibility
+  BASE_URL="${BASE_URL}" HOST_PORT="${HOST_PORT}" bash -x ./set-secret-api.sh \
+    || die "set-secret-api.sh failed"
+
+  info "set-secret-api.sh completed."
+}
+
 run_tests_host() {
   info "Running tests on host (not in container)…"
   BASE_URL="${BASE_URL}" bash ./test.sh
@@ -98,6 +114,7 @@ docker compose up -d --build
 # 3) wait until the app is ready on localhost
 wait_for_app
 
+run_set_secret_api
 # 4) run tests on the host
 run_tests_host
 
