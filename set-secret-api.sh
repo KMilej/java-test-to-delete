@@ -35,8 +35,6 @@ if [[ -z "$SECRET" ]]; then
   exit 1
 fi
 
-
-# Escape quotes
 SECRET_ESCAPED="${SECRET//\"/\\\"}"
 
 # If key exists, replace it; else append

@@ -136,10 +136,13 @@ colima version 0.9.1
 brew install docker colima docker-compose
 ```
 
+#### Enable Docker Compose v2 plugin
 ```text
 mkdir -p ~/.docker/cli-plugins
 ln -sfn $(which docker-compose) ~/.docker/cli-plugins/docker-compose
 ```
+
+#### Configure API secrets
 ```bash
 bash set-secret-api.sh
 ```

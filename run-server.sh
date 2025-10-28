@@ -79,18 +79,18 @@ run_tests_host() {
   info "Tests finished "
 }
 
-# -------- main --------
-# 0) sanity checks
+# main
+# 0) checks
 [[ -f "$COMPOSE_FILE" ]] || die "$COMPOSE_FILE not found in $(pwd)"
 [[ -f "./test.sh" ]] || die "test.sh not found in $(pwd)"
 [[ -f "./gradlew" ]] || warn "gradlew not found — ensure your compose runs bootRun inside the container"
 
-# 1) required tools (NO INSTALLS)
+# 1) required tools
 ensure_approov_cli
 ensure_docker_v2
 print_versions
 
-# 2) build & start container (detached) — ONLY v2
+# 2) build & start container - ONLY v2
 info "Starting containers (detached) with build…"
 docker compose up -d --build
 
