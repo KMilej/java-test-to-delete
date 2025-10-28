@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+approov api -list
+
 # Usage:
 #   ./set-secret-api.sh           # writes to ./.env
 #   ./set-secret-api.sh path/.env # writes to a specific file
@@ -19,7 +21,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 
-# Run the Approov CLI and capture only the Base64 secret (ignore the "note" line)
+# Run the Approov CLI and capture only the Base64 secret
 SECRET="$(
   approov secret -get base64 2>/dev/null \
   | grep -Eo '^[A-Za-z0-9+/=]{16,}$' \
@@ -34,10 +36,10 @@ if [[ -z "$SECRET" ]]; then
 fi
 
 
-# Escape quotes (just in case)
+# Escape quotes
 SECRET_ESCAPED="${SECRET//\"/\\\"}"
 
-# If key exists (even with leading spaces), replace it; else append
+# If key exists, replace it; else append
 if grep -qE '^[[:space:]]*APPROOV_BASE64_SECRET=' "$ENV_FILE"; then
   awk -v v="$SECRET_ESCAPED" '
     BEGIN{re="^[[:space:]]*APPROOV_BASE64_SECRET="}

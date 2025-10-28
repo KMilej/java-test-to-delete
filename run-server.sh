@@ -26,16 +26,14 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 info(){ echo "info $*"; }
 warn(){ echo "warn $*"; }
 
-# REQUIREMENTS CHECKS
 ensure_approov_cli() {
-  # Change 'approov' to the actual command name if yours is different
   if ! have approov; then
     die "Approov CLI is not installed or not in PATH. It is REQUIRED to run this script."
   fi
 }
 
 ensure_docker_v2() {
-  # 1) Docker CLI present?
+  # 1) Docker CLI present
   if ! have docker; then
     die "Docker CLI is not installed or not in PATH. Docker (CLI + running Engine/daemon) is REQUIRED."
   fi
@@ -75,21 +73,6 @@ wait_for_app() {
   die "Service not responding on ${BASE_URL}/"
 }
 
-run_set_secret_api() {
-  info "Running set-secret-api.sh…"
-
-  # ensure file exists, fix line endings, ensure exec bit
-  [[ -f ./set-secret-api.sh ]] || die "set-secret-api.sh not found in $(pwd)"
-  sed -i 's/\r$//' ./set-secret-api.sh || true
-  chmod +x ./set-secret-api.sh || true
-
-  # pass env needed by the script; enable trace for visibility
-  BASE_URL="${BASE_URL}" HOST_PORT="${HOST_PORT}" bash -x ./set-secret-api.sh \
-    || die "set-secret-api.sh failed"
-
-  info "set-secret-api.sh completed."
-}
-
 run_tests_host() {
   info "Running tests on host (not in container)…"
   BASE_URL="${BASE_URL}" bash ./test.sh
@@ -114,11 +97,9 @@ docker compose up -d --build
 # 3) wait until the app is ready on localhost
 wait_for_app
 
-run_set_secret_api
 # 4) run tests on the host
 run_tests_host
 
-# 5) optional next steps
 echo
 echo "App is running at: ${BASE_URL}/"
 echo "To stop containers: docker compose down"

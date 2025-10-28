@@ -136,6 +136,12 @@ colima version 0.9.1
 brew install docker colima docker-compose
 ```
 
+```text
+mkdir -p ~/.docker/cli-plugins
+ln -sfn $(which docker-compose) ~/.docker/cli-plugins/docker-compose
+```
+
+
 If you have all requirements installed, you can build and run the example inside `quickstart-java-spring`:
 
 ```bash
@@ -191,7 +197,7 @@ set +a  # stop exporting variables
 <h4>When the server is running, you can test the endpoints using bash script in a different terminal.</h4>
 
 ```bash
-bash tests-approov.sh
+bash test.sh
 ```
 
 This script will:
