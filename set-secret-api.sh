@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Usage:
-#   ./set-approov-secret.sh           # writes to ./.env
-#   ./set-approov-secret.sh path/.env # writes to a specific file
+#   ./set-secret-api.sh           # writes to ./.env
+#   ./set-secret-api.sh path/.env # writes to a specific file
 ENV_FILE="${1:-.env}"
 
 # Ensure the .env file exists

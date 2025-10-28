@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 set -Eeu pipefail
 
-# --- sanity checks ---
 need_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "Missing command: $1"; exit 1; }; }
 need_cmd approov
 need_cmd curl
 
-# --- config ---
 BASE_URL="${BASE_URL:-http://localhost:8080}"
 TOKDIR="${TOKDIR:-.config}"
 HDR_NAME="approov-token"
@@ -14,10 +12,10 @@ LOGDIR="$TOKDIR/logs"
 mkdir -p "$TOKDIR" "$LOGDIR"
 LOGFILE="$LOGDIR/$(date '+%Y-%m-%d_%H-%M-%S').log"
 
-# --- show Approov API domains (just info) ---
+# show Approov API domains
 approov api -list || true
 
-# --- Approov state check ---
+# Approov state check
 echo "Approov state:"
 state_resp=$(curl -i -s "$BASE_URL/approov-state")
 state_code=$(echo "$state_resp" | grep -m1 HTTP | awk '{print $2}')
@@ -30,7 +28,7 @@ else
   approov_disabled=true
 fi
 
-# --- helpers ---
+
 test_results=()
 run_test() {
   local name="$1"; shift
@@ -80,13 +78,13 @@ skip_test() {
   } >> "$LOGFILE" 2>&1
 }
 
-# --- 0) Unprotected endpoint ---
+# 0) Unprotected endpoint
 run_test "Unprotected" 200 "$BASE_URL/unprotected"
 
 # If Approov service is disabled, we still try protected endpoints
 # but expected codes differ (mainly 200 instead of 401).
 
-# --- 1) Token check ---
+# 1) Token check
 if $have_tokens; then
   gen_token "$TOKDIR/approov_token_1_valid" -genExample api.example.com || true
 else
@@ -112,7 +110,7 @@ else
     "$BASE_URL/token-check"
 fi
 
-# --- 2) Token Binding ["Authorization"] ---
+# 2) Token Binding ["Authorization"]
 AUTH_VAL="ExampleAuthToken=="
 export HASH_INPUT="$AUTH_VAL"
 
@@ -155,7 +153,7 @@ else
     "$BASE_URL/token-binding-1"
 fi
 
-# --- 3) Token Binding ["Authorization","Content-Digest"] ---
+# 3) Token Binding "Authorization","Content-Digest"
 AUTH_VAL2="ExampleAuthToken=="
 CD_VAL="ContentDigest=="
 export HASH_INPUT="${AUTH_VAL2}${CD_VAL}"
@@ -204,5 +202,5 @@ fi
 
 echo
 echo "Full request and response details are saved in: $LOGFILE"
-echo "Summary:"
-printf ' - %s\n' "${test_results[@]}"
+# echo "Summary:"
+# printf ' - %s\n' "${test_results[@]}"

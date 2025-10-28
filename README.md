@@ -139,7 +139,7 @@ brew install docker colima docker-compose
 If you have all requirements installed, you can build and run the example inside `quickstart-java-spring`:
 
 ```bash
-bash java-spring-approov.sh
+bash run-server.sh
 ```
 
 This script will:
@@ -175,7 +175,7 @@ This script will:
 
 #### Environment Setup Script — `set-approov-secret.sh`
 ```bash
-bash set-approov-secret.sh
+bash set-secret-api.sh
 ```
 
 What is does:
