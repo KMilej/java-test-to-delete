@@ -43,6 +43,7 @@ public class ApiController {
     public Map<String, Object> approovEnable() {
         Map<String, Object> response = new LinkedHashMap<>();
         APPROOV_ENABLED.set(true);
+        TOKEN_BINDING_ENABLED.set(true);
         response.put("approovEnabled", true);
         return response;
     }
@@ -51,6 +52,7 @@ public class ApiController {
     public Map<String, Object> approovDisable() {
         Map<String, Object> response = new LinkedHashMap<>();
         APPROOV_ENABLED.set(false);
+        TOKEN_BINDING_ENABLED.set(false);
         response.put("approovEnabled", false);
         return response;
     }
