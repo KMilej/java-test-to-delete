@@ -7,7 +7,7 @@ plugins {
 group = 'com.criticalblue'
 version = '0.0.1-SNAPSHOT'
 
-// Prefer Java 17 for Gradle + IntelliJ consistency
+
 sourceCompatibility = '17'
 
 repositories {
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'          // brings spring-webmvc
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-integration'
 
@@ -25,20 +25,15 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
     // If you need PS256/384/512:
     // implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
-
     compileOnly 'org.jetbrains:annotations:17.0.0'
-
-    // ❌ REMOVE: this downgrades the servlet API and breaks webmvc
-    // compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
-
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-// (optional) set your entry point if needed for bootRun/bootJar:
+// set your entry point if needed for bootRun:
 tasks.named('bootRun') {
-    mainClass = 'com.criticalblue.approov.jwt.Application' // <-- change to your @SpringBootApplication
+    mainClass = 'com.criticalblue.approov.jwt.Application'
 }
 bootJar {
     mainClass = 'com.criticalblue.approov.jwt.Application'
