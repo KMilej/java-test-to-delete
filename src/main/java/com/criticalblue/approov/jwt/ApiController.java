@@ -29,7 +29,12 @@ public class ApiController {
     }
 
 
-    //Admin Endpoints
+    //Endpoints
+    @GetMapping("/")
+    public String index() {
+        return "Welcome to the Approov JWT Demo API Server!";
+    }
+
 
     @GetMapping("/approov-state")
     public ResponseEntity<Map<String, Object>> approovStatus() {

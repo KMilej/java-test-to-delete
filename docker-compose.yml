@@ -14,7 +14,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080 || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 20

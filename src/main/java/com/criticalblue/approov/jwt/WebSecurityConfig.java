@@ -62,6 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .authorizeRequests()
                     // public
+                    .antMatchers("/").permitAll()
                     .antMatchers("/unprotected").permitAll()
                     .antMatchers("/approov-state", "/approov/enable", "/approov/disable", "/approov/toggle").permitAll()
                     // secured (will still 200 when Approov is OFF due to dummy auth)
