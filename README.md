@@ -140,7 +140,9 @@ brew install docker colima docker-compose
 mkdir -p ~/.docker/cli-plugins
 ln -sfn $(which docker-compose) ~/.docker/cli-plugins/docker-compose
 ```
-
+```bash
+bash set-secret-api.sh
+```
 
 If you have all requirements installed, you can build and run the example inside `quickstart-java-spring`:
 
