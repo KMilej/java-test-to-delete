@@ -16,25 +16,46 @@ APP_SERVICE="${APP_SERVICE:-app}"
 # Show Approov API domains (optional)
 if have approov; then approov api -list || true; fi
 
-# --- Required tools
+# --- Required tools (binaries only; daemon checked later)
 have docker || die "Docker CLI is required"
 docker compose version >/dev/null 2>&1 || die "'docker compose' v2 required"
-docker version >/dev/null 2>&1 || die "Docker daemon not running"
-
 have approov || die "Approov CLI is required by test.sh"
 
 [[ -f "$COMPOSE_FILE" ]] || die "$COMPOSE_FILE not found in $(pwd)"
 [[ -f "./test.sh" ]] || die "test.sh not found in $(pwd)"
 
-# --- Colima (optional): start automatically if installed and not running
-if have colima; then
-  if ! colima status >/dev/null 2>&1; then
+# --- Ensure Docker engine is running (start Colima/Docker Desktop if needed)
+ensure_engine() {
+  if docker info >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if have colima; then
     info "Starting Colima..."
     colima start || die "Failed to start Colima"
-  else
-    info "Colima is already running."
+    # re-check
+    docker info >/dev/null 2>&1 || die "Docker daemon still not running after starting Colima"
+    return 0
   fi
-fi
+
+  # macOS: try to start Docker Desktop
+  if [[ "${OSTYPE:-}" == darwin* ]]; then
+    warn "Docker daemon not running. Attempting to start Docker Desktop…"
+    open -ga Docker || true
+    for i in {1..60}; do
+      if docker info >/dev/null 2>&1; then
+        info "Docker Desktop is up."
+        return 0
+      fi
+      sleep 2
+    done
+    die "Docker daemon not running. Please start Docker Desktop."
+  fi
+
+  die "Docker daemon not running. Please start your Docker engine."
+}
+
+ensure_engine
 
 print_versions() {
   echo "== Versions =="
@@ -54,7 +75,7 @@ info "Starting ${APP_SERVICE} (detached) with build…"
 docker compose up -d --build "${APP_SERVICE}"
 
 # --- Wait for HTTP health endpoint
-info "Waiting for ${BASE_URL}${HEALTH_PATH}…"
+info "Waiting for ${BASE_URL}${HEALTH_PATH}…" "to build, please wait"
 for i in $(seq 1 "$WAIT_RETRIES"); do
   if curl -sf "${BASE_URL}${HEALTH_PATH}" >/dev/null 2>&1; then
     info "App is up"
