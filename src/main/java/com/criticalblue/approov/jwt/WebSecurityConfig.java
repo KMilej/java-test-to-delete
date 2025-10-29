@@ -37,9 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Configuration
-    // @IMPORTANT Approov token check must be at Order 1. Any other type of
-    //            Authentication (User, API Key, etc.) for the request should go
-    //            after this one with @Order(2).
+
     @Order(1)
     public static class ApproovWebSecurityConfig extends WebSecurityConfigurerAdapter {
 

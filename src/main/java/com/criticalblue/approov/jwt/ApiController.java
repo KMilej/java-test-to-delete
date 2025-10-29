@@ -15,7 +15,7 @@ public class ApiController {
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
     public static boolean isTokenBindingEnebled = true;
 
-    // --- Global flags (thread-safe) ---
+    // Global flags
     public static final AtomicBoolean APPROOV_ENABLED = new AtomicBoolean(true);   // default: ON
     private static final AtomicBoolean TOKEN_BINDING_ENABLED = new AtomicBoolean(true);
 

@@ -31,10 +31,9 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
 
     private boolean validTokenBinding;
 
-    /** NEW: whether to enforce token binding for THIS request */
+    /** whether to enforce token binding for THIS request */
     private final boolean enforceBinding;
 
-    /** Main constructor – explicitly controls enforceBinding */
     public ApproovAuthentication(ApproovConfig approovConfig, String approovToken,
                                  String tokenBindingHeader, boolean enforceBinding) {
         this.approovConfig = approovConfig;
@@ -80,7 +79,7 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
             throw new ApproovAuthenticationException(message, HttpStatus.UNAUTHORIZED.value());
         }
 
-        // ── KEY: check token binding only when enforceBinding == true
+        // check token binding only when enforceBinding == true
         if (enforceBinding) {
             if (tokenBindingHeader == null || tokenBindingHeader.isEmpty()) {
                 throw new ApproovAuthenticationException(
@@ -95,7 +94,7 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
                         "Approov token binding mismatch.", HttpStatus.UNAUTHORIZED.value());
             }
         } else {
-            validTokenBinding = true; // binding disabled for this endpoint
+            validTokenBinding = true;
         }
 
         isAuthenticated = true;
