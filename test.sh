@@ -203,4 +203,4 @@ fi
 echo
 echo "Full request and response details are saved in: $LOGFILE"
 # echo "Summary:"
-# printf ' - %s\n' "${test_results[@]}"
+# printf ' - %s\n' "${test_results[@]}" .
