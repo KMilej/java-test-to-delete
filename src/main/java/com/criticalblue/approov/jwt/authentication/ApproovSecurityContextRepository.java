@@ -26,10 +26,9 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         HttpServletRequest request = requestResponseHolder.getRequest();
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        // ─────────────────────────────────────────────────────────────────────
-        // NEW: When Approov is disabled, auto-authenticate everything so
+
+        // When Approov is disabled, auto-authenticate everything so
         // secured endpoints still return 200 and controller can show "skipped".
-        // ─────────────────────────────────────────────────────────────────────
         if (!ApiController.isApproovEnabled()) {
             var dummy = new UsernamePasswordAuthenticationToken("approov-disabled", null, Collections.emptyList());
             context.setAuthentication(dummy);
