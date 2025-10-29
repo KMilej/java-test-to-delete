@@ -1,11 +1,12 @@
-services:
+
+service:
   app:
     container_name: app-approov
     build:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "8080:8080"
+      - "${HOST_PORT:-8080}:8080"     # host:container
     volumes:
       - ./:/workspace
       - gradle-cache:/workspace/.gradle
@@ -18,18 +19,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-
-  tests:
-    container_name: test-approov
-    image: eclipse-temurin:17-jdk
-    depends_on:
-      app:
-        condition: service_healthy
-    working_dir: /workspace
-    volumes:
-      - ./:/workspace
-    entrypoint: [ "bash", "-lc" ]
-    command: [ "./tests.sh" ]
 
 volumes:
   gradle-cache:

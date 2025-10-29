@@ -1,110 +1,77 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# show Approov API domains
-approov api -list || true
-
-HOST_PORT="${HOST_PORT:-8080}"
-BASE_URL="http://localhost:${HOST_PORT}"
-WAIT_RETRIES="${WAIT_RETRIES:-40}"
-COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
-
-# Check if Colima is running; if not, start it automatically
-if ! colima status >/dev/null 2>&1; then
-  echo "Colima is not running. Starting Colima..."
-  colima start
-  if [ $? -ne 0 ]; then
-    echo " Failed to start Colima. Please start it manually."
-    exit 1
-  fi
-else
-  echo " Colima is already running."
-fi
-
 have() { command -v "$1" >/dev/null 2>&1; }
 die() { echo "ERROR: $*" >&2; exit 1; }
 info(){ echo "info $*"; }
 warn(){ echo "warn $*"; }
 
-ensure_approov_cli() {
-  if ! have approov; then
-    die "Approov CLI is not installed or not in PATH. It is REQUIRED to run this script."
-  fi
-}
+HOST_PORT="${HOST_PORT:-8080}"
+BASE_URL="http://localhost:${HOST_PORT}"
+HEALTH_PATH="${HEALTH_PATH:-/}"           # e.g. /actuator/health
+WAIT_RETRIES="${WAIT_RETRIES:-40}"
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
+APP_SERVICE="${APP_SERVICE:-app}"
 
-ensure_docker_v2() {
-  # 1) Docker CLI present
-  if ! have docker; then
-    die "Docker CLI is not installed or not in PATH. Docker (CLI + running Engine/daemon) is REQUIRED."
-  fi
+# Show Approov API domains (optional)
+if have approov; then approov api -list || true; fi
 
-  # 2) 'docker compose' (v2)
-  if ! docker compose version >/dev/null 2>&1; then
-    die "'docker compose' (Docker Compose v2) is not available. Install the Compose v2 plugin or use Docker Desktop, which bundles it."
-  fi
+# --- Required tools
+have docker || die "Docker CLI is required"
+docker compose version >/dev/null 2>&1 || die "'docker compose' v2 required"
+docker version >/dev/null 2>&1 || die "Docker daemon not running"
 
-  # 3) Check if Docker daemon is running
-  if ! docker version >/dev/null 2>&1; then
-    warn "Docker daemon is not reachable (is the engine running?)."
-    if have colima; then
-      warn "Colima is installed. Start it with: 'colima start' and re-run the script."
-    fi
-    die "Docker Engine is not running. Start Docker Desktop or Colima, then re-run."
+have approov || die "Approov CLI is required by test.sh"
+
+[[ -f "$COMPOSE_FILE" ]] || die "$COMPOSE_FILE not found in $(pwd)"
+[[ -f "./test.sh" ]] || die "test.sh not found in $(pwd)"
+
+# --- Colima (optional): start automatically if installed and not running
+if have colima; then
+  if ! colima status >/dev/null 2>&1; then
+    info "Starting Colima..."
+    colima start || die "Failed to start Colima"
+  else
+    info "Colima is already running."
   fi
-}
+fi
 
 print_versions() {
   echo "== Versions =="
-  docker version --format '{{.Client.Version}} (client)' || docker version || true
+  docker version --format '{{.Client.Version}} (client)' || true
   docker compose version || true
 }
-
-wait_for_app() {
-  info "Waiting for ${BASE_URL}/ to respond…"
-  for i in $(seq 1 "$WAIT_RETRIES"); do
-    if curl -sf "${BASE_URL}/" >/dev/null 2>&1; then
-      info "App is up "
-      return 0
-    fi
-    printf "wait - attempt %d/%d\r" "$i" "$WAIT_RETRIES"
-    sleep 2
-  done
-  echo
-  die "Service not responding on ${BASE_URL}/"
-}
-
-run_tests_host() {
-  info "Running tests on host (not in container)…"
-  BASE_URL="${BASE_URL}" bash ./test.sh
-  info "Tests finished "
-}
-
-# main
-# 0) checks
-[[ -f "$COMPOSE_FILE" ]] || die "$COMPOSE_FILE not found in $(pwd)"
-[[ -f "./test.sh" ]] || die "test.sh not found in $(pwd)"
-[[ -f "./gradlew" ]] || warn "gradlew not found — ensure your compose runs bootRun inside the container"
-
-# 1) required tools
-ensure_approov_cli
-ensure_docker_v2
 print_versions
 
-# 2) build & start container - ONLY v2
-info "Starting containers (detached) with build…"
-docker compose up -d --build
+cleanup() {
+  info "Shutting down environment…"
+  docker compose down -v || true
+}
+trap cleanup EXIT
 
-# 3) wait until the app is ready on localhost
-wait_for_app
+# --- Start only the app container
+info "Starting ${APP_SERVICE} (detached) with build…"
+docker compose up -d --build "${APP_SERVICE}"
 
-# 4) run tests on the host
-run_tests_host
+# --- Wait for HTTP health endpoint
+info "Waiting for ${BASE_URL}${HEALTH_PATH}…"
+for i in $(seq 1 "$WAIT_RETRIES"); do
+  if curl -sf "${BASE_URL}${HEALTH_PATH}" >/dev/null 2>&1; then
+    info "App is up"
+    break
+  fi
+  printf "wait - attempt %d/%d\r" "$i" "$WAIT_RETRIES"
+  sleep 2
+  [[ $i -eq $WAIT_RETRIES ]] && echo && die "Service not responding on ${BASE_URL}${HEALTH_PATH}"
+done
+
+# --- Run tests on the host
+info "Running tests (host)…"
+BASE_URL="${BASE_URL}" bash ./test.sh
+rc=$?
+info "Tests finished with code: $rc"
 
 echo
 echo "App is running at: ${BASE_URL}/"
-echo "To stop containers: docker compose down"
-
-# Turn off running containers after tests
-docker ps
-docker stop app-approov || warn "Could not stop 'app-approov'. Check service name or use 'docker compose down'."
-docker stop test-approov || warn "Could not stop 'tests-approov'. Check service name or use 'docker compose down'."
+echo "Containers will be stopped now (trap)."
+exit $rc

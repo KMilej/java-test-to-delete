@@ -15,7 +15,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
     cp .env.example "$ENV_FILE"
     echo " Created ${ENV_FILE} from .env.example"
   else
-    echo "⚠  No ${ENV_FILE} or .env.example found. Creating an empty ${ENV_FILE}."
+    echo "  No ${ENV_FILE} or .env.example found. Creating an empty ${ENV_FILE}."
     touch "$ENV_FILE"
   fi
 fi

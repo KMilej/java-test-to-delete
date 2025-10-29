@@ -13,7 +13,7 @@ mkdir -p "$TOKDIR" "$LOGDIR"
 LOGFILE="$LOGDIR/$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 # show Approov API domains
-approov api -list || true
+approov api -list
 
 # Approov state check
 echo "Approov state:"
