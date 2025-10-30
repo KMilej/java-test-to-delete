@@ -1,4 +1,4 @@
-
+# compose.yaml
 services:
   app:
     container_name: app-approov
@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "${HOST_PORT:-8080}:8080"     # host:container
+      - "${HOST_PORT:-8080}:8080"   # host:container
     volumes:
       - ./:/workspace
       - gradle-cache:/workspace/.gradle

@@ -401,17 +401,6 @@ curl -X GET http://localhost:8080/approov-state      # check current state
 
 #### You can rerun the tests with Approov disabled to observe how the application behaves when the Approov service is `no longer active`.
 
-### Troubleshooting
-- Ensure your Approov account credentials are still configured and valid. Approov credentials typically expire after two hours, so you may need to refresh or re-authenticate before running tests or making API requests.
-
-| Problem                 | Likely Cause                                                      |
-| ----------------------- |-------------------------------------------------------------------|
-| `Invalid Token`         | Secret mismatch or hash mismatch in pay claim                     |
-| `Signature mismatch`    | Token signature doesn’t match expected HMAC (wrong key)           |
-| `401 Unauthorized`      | Token expired, missing, or required headers not included          |
-| `Token looks wrong`     | Use approov token -check <token> to inspect it                    |
-| `Wrong secret format`   | Use approov secret -get base64.                                   |
-
 ## Issues
 
 If you find any issue while following our instructions then just report it [here](https://github.com/approov/quickstart-java-spring-token-check/issues), with the steps to reproduce it, and we will sort it out and/or guide you to the correct path.
