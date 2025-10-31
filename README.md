@@ -53,6 +53,7 @@ The request flow:
 
 </details>
 
+---
 This `quickstart` implements the [Approov](https://approov.io) server-side request verification code using the Java Spring Boot Framework.
 
 Approov provides comprehensive [runtime application self protection](https://approov.io/mobile-app-security/rasp) delivering app attestation, dynamic certificate pinning, runtime secrets protection, and API shielding - all unified across Android, iOS, and HarmonyOS.
@@ -265,7 +266,7 @@ set +a  # stop exporting variables
 
 #### The following example shows how the API responds when no Approov protection is applied.
 ```bash
-curl -X GET http://localhost:8080/unprotected
+curl -iX GET http://localhost:8080/unprotected
 ```
 
 The response will be a `200` for request:
@@ -296,7 +297,7 @@ approov token -genExample api.example.com
 
 #### Use the generated token in the `Approov-Token` header and /token-check endpoint. 
 ```bash
-curl -X GET http://localhost:8080/token-check \
+curl -iX GET http://localhost:8080/token-check \
      -H "Approov-Token: <valid_approov_token_here>"
 ```
 
@@ -331,7 +332,7 @@ approov token -setDataHashInToken your-custom-name -genExample api.example.com
 #### Use the generated token with binding in the Approov-Token and Authorization headers when calling the /token-binding-1 endpoint.
 
 ```bash
-curl -X GET http://localhost:8080/token-binding-1 \
+curl -iX GET http://localhost:8080/token-binding-1 \
      -H "Approov-Token: <valid_approov_token_here>" \
      -H "Authorization: <your-custom-name>"
 ```
@@ -367,7 +368,7 @@ approov token -setDataHashInToken ExampleAuthToken==ContentDigest== -genExample 
 #### Use the generated token with two binding in the Approov-Token and Authorization headers when calling the /token-binding-2 endpoint.
 
 ```bash
-curl -X GET http://localhost:8080/token-binding-2 \
+curl -iX GET http://localhost:8080/token-binding-2 \
      -H "Approov-Token: <valid_approov_token_here>" \
      -H "Authorization: ExampleAuthToken==" \
      -H "Content-Digest: ContentDigest=="
