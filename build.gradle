@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.criticalblue'
+group = 'io.approov'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -32,12 +32,4 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-}
-
-// set your entry point if needed for bootRun:
-tasks.named('bootRun') {
-    mainClass = 'com.criticalblue.approov.jwt.Application'
-}
-bootJar {
-    mainClass = 'com.criticalblue.approov.jwt.Application'
 }

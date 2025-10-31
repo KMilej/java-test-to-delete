@@ -86,7 +86,7 @@ run_test "Unprotected" 200 "$BASE_URL/unprotected"
 
 # 1) Token check
 if $have_tokens; then
-  gen_token "$TOKDIR/approov_token_1_valid" -genExample api.example.com || true
+  gen_token "$TOKDIR/approov_token_1_valid" -genExample example.com || true
 else
   true
 fi
@@ -103,7 +103,7 @@ else
     "$BASE_URL/token-check"
 
   # 1.2 Invalid Token
-  gen_token "$TOKDIR/approov_token_1_invalid" -genExample api.example.com -type invalid || true
+  gen_token "$TOKDIR/approov_token_1_invalid" -genExample example.com -type invalid || true
   if [ "$approov_disabled" = true ]; then expected_status=200; else expected_status=401; fi
   run_test "Token check (invalid)" "$expected_status" \
     -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_1_invalid")" \
@@ -115,7 +115,7 @@ AUTH_VAL="ExampleAuthToken=="
 export HASH_INPUT="$AUTH_VAL"
 
 if $have_tokens; then
-  gen_token "$TOKDIR/approov_token_2_valid" -setDataHashInToken "$HASH_INPUT" -genExample api.example.com || true
+  gen_token "$TOKDIR/approov_token_2_valid" -setDataHashInToken "$HASH_INPUT" -genExample example.com || true
 fi
 
 if ! $have_tokens; then
@@ -145,7 +145,7 @@ else
     "$BASE_URL/token-binding-1"
 
   # 2.4 Invalid Token
-  gen_token "$TOKDIR/approov_token_2_invalid" -setDataHashInToken "$HASH_INPUT" -genExample api.example.com -type invalid || true
+  gen_token "$TOKDIR/approov_token_2_invalid" -setDataHashInToken "$HASH_INPUT" -genExample example.com -type invalid || true
   if [ "$approov_disabled" = true ]; then expected_status=200; else expected_status=401; fi
   run_test "Token Binding (invalid token)" "$expected_status" \
     -H "Authorization: $AUTH_VAL" \
@@ -159,7 +159,7 @@ CD_VAL="ContentDigest=="
 export HASH_INPUT="${AUTH_VAL2}${CD_VAL}"
 
 if $have_tokens; then
-  gen_token "$TOKDIR/approov_token_3_valid" -setDataHashInToken "$HASH_INPUT" -genExample api.example.com || true
+  gen_token "$TOKDIR/approov_token_3_valid" -setDataHashInToken "$HASH_INPUT" -genExample example.com || true
 fi
 
 if ! $have_tokens; then
@@ -191,7 +191,7 @@ else
     "$BASE_URL/token-binding-2"
 
   # 3.4 Invalid token
-  gen_token "$TOKDIR/approov_token_3_invalid" -setDataHashInToken "$HASH_INPUT" -genExample api.example.com -type invalid || true
+  gen_token "$TOKDIR/approov_token_3_invalid" -setDataHashInToken "$HASH_INPUT" -genExample example.com -type invalid || true
   if [ "$approov_disabled" = true ]; then expected_status=200; else expected_status=401; fi
   run_test "Token Binding 2 (invalid token)" "$expected_status" \
     -H "Authorization: $AUTH_VAL2" \

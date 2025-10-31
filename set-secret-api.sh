@@ -50,4 +50,4 @@ fi
 
 echo " APPROOV_BASE64_SECRET updated in ${ENV_FILE}"
 
-YES YES | approov api -add api.example.com >/dev/null
+YES YES | approov api -add example.com >/dev/null
