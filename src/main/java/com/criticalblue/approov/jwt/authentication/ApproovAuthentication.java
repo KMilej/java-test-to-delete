@@ -6,6 +6,7 @@ import java.util.Collections;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,8 +139,9 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
 
     private void parseTokenClaims(byte[] approovSecret) {
         try {
-            approovTokenPayloadClaims = Jwts.parser()
-                    .setSigningKey(approovSecret)
+            approovTokenPayloadClaims = Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(approovSecret))
+                    .build()
                     .parseClaimsJws(approovToken)
                     .getBody();
 

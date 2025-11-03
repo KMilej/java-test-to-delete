@@ -34,7 +34,7 @@ public class ApproovAuthenticationEntryPoint implements AuthenticationEntryPoint
         if (authException instanceof ApproovException) {
             return ((ApproovException) authException).getHttpStatusCode();
         }
-        return HttpStatus.BAD_REQUEST.value();
+        return HttpStatus.UNAUTHORIZED.value();
     }
 
     private static void logFailure(int httpStatusCode, AuthenticationException authException) {

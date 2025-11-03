@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+bin/
 !gradle/wrapper/gradle-wrapper.jar
 
 ### STS ###
@@ -33,3 +34,7 @@ nbdist/
 .env
 local.properties
 .run/
+
+.config/logs/
+.config/*.log
+.config/*.tmp
