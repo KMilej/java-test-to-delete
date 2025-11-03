@@ -1,9 +1,7 @@
 package com.criticalblue.approov.jwt.authentication;
 
 import org.apache.tomcat.util.codec.binary.Base64;
-
 import org.jetbrains.annotations.NotNull;
-
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,16 +31,13 @@ public class ApproovAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(@NotNull Authentication authentication) throws AuthenticationException {
-
-        if (!supports(authentication.getClass())) {
+    public Authentication authenticate(@NotNull Authentication candidate) throws AuthenticationException {
+        if (!supports(candidate.getClass())) {
             return null;
         }
 
-        ApproovJwtAuthentication approovTokenAuthentication = (ApproovJwtAuthentication) authentication;
-
-        approovTokenAuthentication.verifyApproovToken(approovSecret);
-
-        return approovTokenAuthentication;
+        ApproovJwtAuthentication approovAuthentication = (ApproovJwtAuthentication) candidate;
+        approovAuthentication.verifyApproovToken(approovSecret);
+        return approovAuthentication;
     }
 }

@@ -7,37 +7,44 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-
 /**
- * When a failure occurs during the Approov token authentication process, an exception is thrown and Spring redirects
- * to an authentication entry point, that have been configured in the Sring security to be this one.
- *
- * @see com.criticalblue.approov.jwt.WebSecurityConfig
- * @see ApproovAuthentication
- * @see ApproovTokenBindingAuthentication
+ * Handles authentication failures raised during the Approov token verification process.
  */
 public class ApproovAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final static Logger logger = LoggerFactory.getLogger(ApproovAuthenticationEntryPoint.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ApproovAuthenticationEntryPoint.class);
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        int httpStatusCode = HttpStatus.BAD_REQUEST.value();
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException) throws IOException, ServletException {
 
-        if (authException instanceof ApproovException) {
-            httpStatusCode = ((ApproovException) authException).getHttpStatusCode();
-        }
-
-        final String httpStatusMessage = String.valueOf(HttpStatus.valueOf(httpStatusCode));
-        final String exceptionType = String.valueOf(authException.getClass());
-        final String exceptionMessage = authException.getMessage();
-
-        logger.error(httpStatusMessage + " | " + exceptionType + " | " + exceptionMessage + " | Stacktrace origin: " + authException.getStackTrace()[0].toString());
+        int httpStatusCode = resolveHttpStatus(authException);
+        logFailure(httpStatusCode, authException);
         response.sendError(httpStatusCode);
+    }
+
+    private static int resolveHttpStatus(AuthenticationException authException) {
+        if (authException instanceof ApproovException) {
+            return ((ApproovException) authException).getHttpStatusCode();
+        }
+        return HttpStatus.BAD_REQUEST.value();
+    }
+
+    private static void logFailure(int httpStatusCode, AuthenticationException authException) {
+        StackTraceElement[] stackTrace = authException.getStackTrace();
+        String origin = stackTrace.length > 0 ? stackTrace[0].toString() : "unknown";
+        LOGGER.error(
+                "{} | {} | {} | Origin: {}",
+                HttpStatus.valueOf(httpStatusCode),
+                authException.getClass().getName(),
+                authException.getMessage(),
+                origin);
     }
 }

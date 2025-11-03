@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class Application {
 
-    private static Logger logger = LoggerFactory.getLogger(Application.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     @Value("${http.port}")
     private int httpPort;
@@ -40,7 +40,7 @@ public class Application {
             @Override
             protected void postProcessContext(Context context) {
                 if (isToRedirectHttp) {
-                    logger.info("Creating security constrain to redirect http to https.");
+                    LOGGER.info("Creating security constraint to redirect HTTP to HTTPS.");
                     SecurityConstraint securityConstraint = new SecurityConstraint();
                     securityConstraint.setUserConstraint("CONFIDENTIAL");
                     SecurityCollection collection = new SecurityCollection();
@@ -62,11 +62,12 @@ public class Application {
         connector.setPort(httpPort);
         connector.setSecure(false);
 
-        if (isToRedirectHttp) {
-            logger.info("Redirecting http to port: {}", httpsPort);
-            connector.setRedirectPort(httpsPort);
+        if (!isToRedirectHttp) {
+            return connector;
         }
 
+        LOGGER.info("Redirecting HTTP to port {}", httpsPort);
+        connector.setRedirectPort(httpsPort);
         return connector;
     }
 }

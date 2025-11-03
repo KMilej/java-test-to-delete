@@ -9,118 +9,95 @@ import io.jsonwebtoken.Jwts;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 
 public class ApproovAuthentication implements ApproovJwtAuthentication {
 
-    private static Logger logger = LoggerFactory.getLogger(ApproovAuthentication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApproovAuthentication.class);
 
-    private final ApproovTokenBindingAuthentication approovPayload = new ApproovTokenBindingAuthentication();
-
-    private final ApproovConfig approovConfig;
-
-    private Claims approovTokenPayloadClaims;
-
-    private String tokenBindingHeader;
-
-    private String approovToken;
-
-    private boolean isAuthenticated = false;
-
-    private boolean validTokenBinding;
-
-    /** whether to enforce token binding for THIS request */
+    private final ApproovTokenBindingAuthentication tokenBindingValidator =
+            new ApproovTokenBindingAuthentication();
+    private final String tokenBindingHeader;
     private final boolean enforceBinding;
 
-    public ApproovAuthentication(ApproovConfig approovConfig, String approovToken,
-                                 String tokenBindingHeader, boolean enforceBinding) {
-        this.approovConfig = approovConfig;
+    private Claims approovTokenPayloadClaims;
+    private String approovToken;
+    private boolean authenticated;
+    private boolean validTokenBinding;
+
+    @Deprecated(forRemoval = false)
+    public ApproovAuthentication(
+            ApproovConfig approovConfig,
+            String approovToken,
+            String tokenBindingHeader,
+            boolean enforceBinding) {
+        this(approovToken, tokenBindingHeader, enforceBinding);
+    }
+
+    public ApproovAuthentication(
+            String approovToken, String tokenBindingHeader, boolean enforceBinding) {
         this.approovToken = approovToken;
         this.tokenBindingHeader = tokenBindingHeader;
         this.enforceBinding = enforceBinding;
     }
+
     /**
-     * Verifies the Approov token and, when enforceBinding == true,
-     * also checks the token binding.
+     * Verifies the Approov token and, when {@code enforceBinding == true}, also checks the token binding.
      *
      * @param approovSecret The Approov secret for verifying the token signature.
-     * @throws ApproovAuthenticationException When the token is invalid or, when enforceBinding == true,
+     * @throws ApproovAuthenticationException When the token is invalid or, when {@code enforceBinding == true},
      *                                        the token binding check fails.
      */
-
     @Override
     public void verifyApproovToken(byte[] approovSecret) throws ApproovAuthenticationException {
+        validateSecret(approovSecret);
+        approovToken = sanitizeToken(approovToken);
+        parseTokenClaims(approovSecret);
 
-        if (approovSecret == null) {
-            throw new ApproovAuthenticationException("The Approov secret is null.", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-
-        if (approovToken == null) {
-            throw new ApproovAuthenticationException("The Approov token is null.", HttpStatus.FORBIDDEN.value());
-        }
-
-        approovToken = approovToken.trim();
-
-        if (approovToken.equals("")) {
-            throw new ApproovAuthenticationException("The Approov token is empty.", HttpStatus.BAD_REQUEST.value());
-        }
-
-        try {
-            approovTokenPayloadClaims = Jwts.parser()
-                    .setSigningKey(approovSecret)
-                    .parseClaimsJws(approovToken)
-                    .getBody();
-
-            logger.info("Request approved with a valid Approov token.");
-        } catch (JwtException e) {
-            String message = "Request with an invalid Approov token: " + e.getMessage();
-            throw new ApproovAuthenticationException(message, HttpStatus.UNAUTHORIZED.value());
-        }
-
-        // check token binding only when enforceBinding == true
         if (enforceBinding) {
-            if (tokenBindingHeader == null || tokenBindingHeader.isEmpty()) {
-                throw new ApproovAuthenticationException(
-                        "Token binding enabled for this endpoint, but the binding header is missing.",
-                        HttpStatus.UNAUTHORIZED.value());
-            }
-            validTokenBinding = approovPayload.checkClaimMatchesFor(
-                    tokenBindingHeader, approovTokenPayloadClaims, approovConfig);
-
-            if (!validTokenBinding) {
-                throw new ApproovAuthenticationException(
-                        "Approov token binding mismatch.", HttpStatus.UNAUTHORIZED.value());
-            }
+            validateTokenBinding();
         } else {
             validTokenBinding = true;
         }
 
-        isAuthenticated = true;
+        authenticated = true;
     }
 
+    @Override
+    public Claims getApproovTokenPayloadClaims() {
+        return approovTokenPayloadClaims;
+    }
 
     @Override
-    public Claims getApproovTokenPayloadClaims() { return approovTokenPayloadClaims; }
+    public boolean isValidTokenBinding() {
+        return validTokenBinding;
+    }
 
     @Override
-    public boolean isValidTokenBinding() { return validTokenBinding; }
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() { return Collections.emptyList(); }
+    public Object getCredentials() {
+        return approovToken;
+    }
 
     @Override
-    public Object getCredentials() { return approovToken; }
+    public Object getDetails() {
+        return approovTokenPayloadClaims;
+    }
 
     @Override
-    public Object getDetails() { return approovTokenPayloadClaims; }
+    public Object getPrincipal() {
+        return null;
+    }
 
     @Override
-    public Object getPrincipal() { return null; }
-
-    @Override
-    public boolean isAuthenticated() { return isAuthenticated; }
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
@@ -132,5 +109,56 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
     }
 
     @Override
-    public String getName() { return null; }
+    public String getName() {
+        return null;
+    }
+
+    private void validateSecret(byte[] approovSecret) {
+        if (approovSecret != null) {
+            return;
+        }
+        throw new ApproovAuthenticationException(
+                "The Approov secret is null.", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    private String sanitizeToken(String candidateToken) {
+        if (candidateToken == null) {
+            throw new ApproovAuthenticationException(
+                    "The Approov token is null.", HttpStatus.FORBIDDEN.value());
+        }
+
+        String trimmedToken = candidateToken.trim();
+        if (!trimmedToken.isEmpty()) {
+            return trimmedToken;
+        }
+
+        throw new ApproovAuthenticationException(
+                "The Approov token is empty.", HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void parseTokenClaims(byte[] approovSecret) {
+        try {
+            approovTokenPayloadClaims = Jwts.parser()
+                    .setSigningKey(approovSecret)
+                    .parseClaimsJws(approovToken)
+                    .getBody();
+
+            LOGGER.info("Request approved with a valid Approov token.");
+        } catch (JwtException e) {
+            String message = "Request with an invalid Approov token: " + e.getMessage();
+            throw new ApproovAuthenticationException(message, HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    private void validateTokenBinding() {
+        if (tokenBindingHeader == null || tokenBindingHeader.trim().isEmpty()) {
+            throw new ApproovAuthenticationException(
+                    "Token binding enabled for this endpoint, but the binding header is missing.",
+                    HttpStatus.UNAUTHORIZED.value());
+        }
+
+        String bindingHeader = tokenBindingHeader.trim();
+        validTokenBinding =
+                tokenBindingValidator.checkClaimMatchesFor(bindingHeader, approovTokenPayloadClaims);
+    }
 }

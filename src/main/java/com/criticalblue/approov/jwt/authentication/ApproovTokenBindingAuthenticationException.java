@@ -19,6 +19,7 @@ class ApproovTokenBindingAuthenticationException extends AuthenticationException
         this.httpStatusCode = httpStatusCode;
     }
 
+    @Override
     public int getHttpStatusCode() {
         return httpStatusCode;
     }

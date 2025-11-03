@@ -17,6 +17,7 @@ class ApproovAuthenticationException extends AuthenticationException implements 
         this.httpStatusCode = httpStatusCode;
     }
 
+    @Override
     public int getHttpStatusCode() {
         return this.httpStatusCode;
     }

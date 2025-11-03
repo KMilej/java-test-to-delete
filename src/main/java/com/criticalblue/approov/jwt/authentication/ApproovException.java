@@ -1,9 +1,9 @@
 package com.criticalblue.approov.jwt.authentication;
 
 /**
- * The Interface to be used in the Approov exceptions.
+ * Marker interface for Approov-specific exceptions exposing HTTP status information.
  */
 public interface ApproovException {
 
-    public int getHttpStatusCode();
+    int getHttpStatusCode();
 }

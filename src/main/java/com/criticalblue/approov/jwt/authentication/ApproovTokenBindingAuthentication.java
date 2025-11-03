@@ -5,70 +5,74 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import io.jsonwebtoken.Claims;
-
 import org.apache.tomcat.util.codec.binary.Base64;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
-public class ApproovTokenBindingAuthentication {
+class ApproovTokenBindingAuthentication {
 
-    private static Logger logger = LoggerFactory.getLogger(ApproovAuthentication.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ApproovTokenBindingAuthentication.class);
 
     /**
-     * Checks the value in the key `pay` of an Approov token matches the token binding header, that by default is
-     * the value for the `Authorization` header.
+     * Checks the value in the key {@code pay} of an Approov token matches the token binding header, that by default is
+     * the value for the {@code Authorization} header.
      *
-     * @param tokenBindingHeader        Extracted from an header, that by default is the Authorization header.
+     * @param tokenBindingHeader        Extracted from the header that carries the binding value.
      * @param approovTokenPayloadClaims Extracted from the already verified Approov token.
-     * @param approovConfig             Extracted from the .env file in the root of the package.
-     * @return
+     * @return {@code true} if the token binding header matches the {@code pay} claim; otherwise throws an exception.
      */
-    boolean checkClaimMatchesFor(String tokenBindingHeader, Claims approovTokenPayloadClaims,  ApproovConfig approovConfig) {
-
+    boolean checkClaimMatchesFor(String tokenBindingHeader, Claims approovTokenPayloadClaims) {
         if (tokenBindingHeader == null) {
-            throw new ApproovTokenBindingAuthenticationException("The token binding header value is null.", HttpStatus.BAD_REQUEST.value());
+            throw new ApproovTokenBindingAuthenticationException(
+                    "The token binding header value is null.", HttpStatus.BAD_REQUEST.value());
         }
 
-        final String approovTokenBindingClaim = getApproovTokenBindingClaim(approovTokenPayloadClaims, approovConfig);
-
-        boolean isValidTokenBinding = getHashBase64Encoded(tokenBindingHeader).equals(approovTokenBindingClaim);
+        String expectedBinding = extractApproovTokenBindingClaim(approovTokenPayloadClaims);
+        boolean isValidTokenBinding =
+                hashBase64Encoded(tokenBindingHeader).equals(expectedBinding);
 
         if (isValidTokenBinding) {
-            logger.info("Request approved with a valid token binding in the Approov token.");
-            return isValidTokenBinding;
+            LOGGER.info("Request approved with a valid token binding in the Approov token.");
+            return true;
         }
 
-        // When the token binding header does not match the value in key `pay`
-        // of the Approov token, the request is aborted.
-        throw new ApproovTokenBindingAuthenticationException("The token binding header does not match the key `pay` in the Approov token.", HttpStatus.UNAUTHORIZED.value());
+        throw new ApproovTokenBindingAuthenticationException(
+                "The token binding header does not match the key `pay` in the Approov token.",
+                HttpStatus.UNAUTHORIZED.value());
     }
 
-    private String getApproovTokenBindingClaim(Claims approovTokenPayloadClaims, ApproovConfig approovConfig) {
-
+    private String extractApproovTokenBindingClaim(Claims approovTokenPayloadClaims) {
         if (approovTokenPayloadClaims == null) {
-            throw new ApproovTokenBindingAuthenticationException("Approov token payload is null.", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            throw new ApproovTokenBindingAuthenticationException(
+                    "Approov token payload is null.", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        if ( ! approovTokenPayloadClaims.containsKey("pay") ) {
-            throw new ApproovTokenBindingAuthenticationException("The key `pay`, for the token binding, is missing in the Approov token payload.", HttpStatus.BAD_REQUEST.value());
+        if (!approovTokenPayloadClaims.containsKey("pay")) {
+            throw new ApproovTokenBindingAuthenticationException(
+                    "The key `pay`, for the token binding, is missing in the Approov token payload.",
+                    HttpStatus.BAD_REQUEST.value());
         }
 
-        final String approovTokenBindingClaim = approovTokenPayloadClaims.get("pay").toString();
-
-        if (approovTokenBindingClaim == null || approovTokenBindingClaim.trim().equals("")) {
-            throw new ApproovTokenBindingAuthenticationException("The token binding in the Approov token is null or empty.", HttpStatus.BAD_REQUEST.value());
+        Object claimValue = approovTokenPayloadClaims.get("pay");
+        if (claimValue == null) {
+            throw new ApproovTokenBindingAuthenticationException(
+                    "The token binding in the Approov token is null.", HttpStatus.BAD_REQUEST.value());
         }
 
-        return approovTokenBindingClaim;
+        String binding = claimValue.toString().trim();
+        if (!binding.isEmpty()) {
+            return binding;
+        }
+
+        throw new ApproovTokenBindingAuthenticationException(
+                "The token binding in the Approov token is empty.", HttpStatus.BAD_REQUEST.value());
     }
 
-    private String getHashBase64Encoded(String value) {
-
-        final MessageDigest digest;
-
+    private String hashBase64Encoded(String value) {
+        MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
@@ -76,6 +80,6 @@ public class ApproovTokenBindingAuthentication {
         }
 
         byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-        return  Base64.encodeBase64String(hash);
+        return Base64.encodeBase64String(hash);
     }
 }
