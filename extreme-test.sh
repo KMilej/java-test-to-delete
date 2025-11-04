@@ -251,7 +251,7 @@ if [ -f "$TOKDIR/approov_token_2_valid" ]; then
     -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_2_valid")" \
     "$BASE_URL/token-check"
 
-    run_test "Extreme 4.3 - token-binding-2 (+valid token + Authorization)" 401 \
+    run_test "Extreme 4.3 - token-binding-2 (+valid token + Authorization)" "$exp_protected" \
     -H "Authorization: $AUTH_VAL" \
     -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_2_valid")" \
     "$BASE_URL/token-binding-2"
@@ -279,7 +279,7 @@ fi
     -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_3_valid")" \
     "$BASE_URL/token-check"
 
-    run_test "Extreme 4.4 - token-binding-1 (+valid token + Authorization + Content-Digest)" 401 \
+    run_test "Extreme 4.4 - token-binding-1 (+valid token + Authorization + Content-Digest)" "$exp_protected" \
     -H "Authorization: $AUTH_VAL2" \
     -H "Content-Digest: $CD_VAL" \
     -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_3_valid")" \
