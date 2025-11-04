@@ -200,6 +200,14 @@ else
     "$BASE_URL/token-binding-2"
 fi
 
+# Summary statistics 
+total_tests=${#test_results[@]}
+passed_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Passed" || true)
+failed_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Failed" || true)
+skipped_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Skipped" || true)
+echo
+echo "Summary: total=$total_tests | passed=$passed_tests | failed=$failed_tests | skipped=$skipped_tests =="
+
 echo
 echo "Full request and response details are saved in: $LOGFILE"
 # echo "Summary:"

@@ -121,15 +121,13 @@ It provides a simple example API `api.example.com` that performs Approov token v
 
 ```test
 Docker Environment:
-Docker version: 28.5.1
-* Services:
-    * app → Spring Boot application container (built from Dockerfile.dev)
-    * tests → JDK 17 test container running ./testall.sh
-* Base Image (Container OS): eclipse-temurin:17-jdk (Debian-based)
+- Docker: 28.5.1+
+- Docker Compose: v2.40.2+ 
+- Docker Colima: 0.9.1+
 
-### Docker, Colima and Docker-Compose
-Docker Compose version 2.40.1
-colima version 0.9.1
+* Base Image (Container OS): eclipse-temurin:17-jdk
+
+(Optional) Host Platform: Colima on macOS or Docker Desktop
 ```
 
 #### Install Docker, Colima and Docker-Compose via Homebrew

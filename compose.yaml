@@ -1,19 +1,17 @@
 # compose.yaml
 services:
   app:
-    container_name: app-approov
+    container_name: java-spring
     build:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "${HOST_PORT:-8080}:8080"   # host:container
+      - "${HOST_PORT:-8080}:8080"   
     volumes:
       - ./:/workspace
       - gradle-cache:/workspace/.gradle
     env_file:
       - .env
-    environment:
-      SPRING_PROFILES_ACTIVE: default
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8080/ || exit 1"]
       interval: 5s

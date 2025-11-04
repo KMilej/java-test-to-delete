@@ -35,6 +35,4 @@ nbdist/
 local.properties
 .run/
 
-.config/logs/
-.config/*.log
-.config/*.tmp
+.config/
