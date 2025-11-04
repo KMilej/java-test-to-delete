@@ -37,7 +37,7 @@ fi
 
 SECRET_ESCAPED="${SECRET//\"/\\\"}"
 
-# If key exists, replace it; else append
+# If key exists, replace it, else append
 if grep -qE '^[[:space:]]*APPROOV_BASE64_SECRET=' "$ENV_FILE"; then
   awk -v v="$SECRET_ESCAPED" '
     BEGIN{re="^[[:space:]]*APPROOV_BASE64_SECRET="}

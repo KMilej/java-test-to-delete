@@ -58,7 +58,7 @@ This `quickstart` implements the [Approov](https://approov.io) server-side reque
 
 Approov provides comprehensive [runtime application self protection](https://approov.io/mobile-app-security/rasp) delivering app attestation, dynamic certificate pinning, runtime secrets protection, and API shielding - all unified across Android, iOS, and HarmonyOS.
 
-It provides a simple example API `api.example.com` that performs Approov token verification before allowing requests to access protected endpoints.
+It provides a simple example API `example.com` that performs Approov token verification before allowing requests to access protected endpoints.
 
 ---
 - The example demonstrates how different API endpoints `/unprotected, /token-check, /token-binding-check, etc.` respond based on the current [Approov configuration](https://ext.approov.io/docs/latest/approov-usage-documentation/#getting-all-api-configuration).
@@ -146,7 +146,7 @@ ln -sfn $(which docker-compose) ~/.docker/cli-plugins/docker-compose
 bash set-secret-api.sh
 ```
 
-If you have all requirements installed, you can build and run the example inside `quickstart-java-spring`:
+If you have all requirements installed, you can build and run the example inside `quickstart-java-spring-token-check`:
 
 ```bash
 bash run-server.sh
@@ -177,7 +177,7 @@ This script will:
 ```
 
 #### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
-#### inside the project folder `quickstart-java-spring`, run:
+#### inside the project folder `quickstart-java-spring-token-check`, run:
 
 ```bash
 ./gradlew build
@@ -191,7 +191,7 @@ bash set-secret-api.sh
 What is does:
 - Creates the `.env` file automatically if `.env does not exist, the script copies it from `.env.example`.
 - Run `approov secret -get base64` to retrieve the Approov secret from the Approov CLI and sets it in the `.env` file.
-- Registers the domain api.example.com in the Approov cloud configuration so it can be protected by Approov.
+- Registers the domain example.com in the Approov cloud configuration so it can be protected by Approov.
 ```bash
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
@@ -228,7 +228,7 @@ This script will:
 ```
 
 #### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
-#### inside the project folder `quickstart-java-spring`, run:
+#### inside the project folder `quickstart-java-spring-token-check`, run:
 
 ```bash
 ./gradlew build
@@ -242,9 +242,9 @@ cp .env.example .env
 ```bash
 approov secret -get base64
 ```
-#### Register the API domain `api.example.com` with the Approov CLI by:
+#### Register the API domain `example.com` with the Approov CLI by:
 ```bash
-approov api -add api.example.com
+approov api -add example.com
 ```
 
 #### Finally, run the Spring Boot application with:
@@ -290,7 +290,7 @@ Cache-Control: no-cache
 
 #### Valid Approov Token request:
 ```bash
-approov token -genExample api.example.com
+approov token -genExample example.com
 ```
 
 #### Use the generated token in the `Approov-Token` header and /token-check endpoint. 
@@ -324,7 +324,7 @@ Cache-Control: no-cache
 
 #### Generate a valid Approov Token with binding:
 ```bash
-approov token -setDataHashInToken your-custom-name -genExample api.example.com
+approov token -setDataHashInToken your-custom-name -genExample example.com
 ```
 
 #### Use the generated token with binding in the Approov-Token and Authorization headers when calling the /token-binding-1 endpoint.
@@ -360,7 +360,7 @@ Cache-Control: no-cache
 
 #### Generate a valid Approov Token with two binding:
 ```bash
-approov token -setDataHashInToken ExampleAuthToken==ContentDigest== -genExample api.example.com
+approov token -setDataHashInToken ExampleAuthToken==ContentDigest== -genExample example.com
 ```
 
 #### Use the generated token with two binding in the Approov-Token and Authorization headers when calling the /token-binding-2 endpoint.
