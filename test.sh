@@ -41,7 +41,7 @@ run_test() {
   echo "$name: $result  (status : $status, expected: $expected)"
   test_results+=("$name: $result")
   {
-    echo "===== $name ====="
+    echo " $name "
     echo "$resp"
     if [ "$approov_disabled" = true ]; then
       echo "Approov State: disabled, no checks performed."
@@ -72,7 +72,7 @@ skip_test() {
   echo "$name: Skipped"
   test_results+=("$name: Skipped")
   {
-    echo "===== $name ====="
+    echo " $name "
     echo "Skipped (token generation unavailable)."
     echo
   } >> "$LOGFILE" 2>&1

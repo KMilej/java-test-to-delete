@@ -203,7 +203,7 @@ fi
 
 # 4) Extreme-test all
 echo
-echo "== Extreme-test  =="
+echo "== Extreme-test"
 
 # 4.1 No headers at all (raw curls)
 if [ "$approov_disabled" = true ]; then exp_protected=200; else exp_protected=401; fi
@@ -288,6 +288,14 @@ fi
 else
   skip_test "Extreme 4.4 (binding-2 token missing: approov_token_3_valid)"
 fi
+
+# Summary statistics 
+total_tests=${#test_results[@]}
+passed_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Passed" || true)
+failed_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Failed" || true)
+skipped_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Skipped" || true)
+echo
+echo "Summary: total=$total_tests | passed=$passed_tests | failed=$failed_tests | skipped=$skipped_tests"
 
 
 echo

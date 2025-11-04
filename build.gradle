@@ -33,3 +33,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
+
+tasks.named('bootJar') {
+    mainClass.set('com.criticalblue.approov.jwt.Application')
+}
+
+tasks.named('bootRun') {
+    mainClass.set('com.criticalblue.approov.jwt.Application')
+}

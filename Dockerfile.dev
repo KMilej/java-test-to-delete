@@ -1,9 +1,6 @@
 FROM eclipse-temurin:17-jdk
 
-# Install curl for health checks / debugging
-RUN apt-get update && apt-get install -y --no-install-recommends curl && \
-    rm -rf /var/lib/apt/lists/*
-
 WORKDIR /workspace
-# Code will be mounted from the host; start the Spring app
+VOLUME ["/home/gradle/.gradle"]
+
 CMD ["bash","-lc","./gradlew --no-daemon bootRun"]

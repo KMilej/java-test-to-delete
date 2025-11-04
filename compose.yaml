@@ -6,17 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "${HOST_PORT:-8080}:8080"   
+      - "${HOST_PORT:-8080}:${HTTP_PORT:-8080}"
     volumes:
       - ./:/workspace
       - gradle-cache:/workspace/.gradle
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
 
 volumes:
   gradle-cache:
