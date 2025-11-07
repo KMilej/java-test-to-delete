@@ -67,7 +67,7 @@ It provides a simple example API `example.com` that performs Approov token verif
 
 ### The quickstart was tested with the following environment:
 ```text
-* Operating System: macOS 15.6.1 (Sequoia)
+* Operating System: macOS Sequoia 15.6.1 (Darwin 15.6, ARM64)
 * JVM: 17.0.14
 * Spring Boot version: 2.6.4
 * Gradle version: 7.6.6
@@ -154,8 +154,8 @@ bash run-server.sh
 
 This script will:
 - Checks environment requirements - verifies that Approov CLI, Docker, Docker Compose v2, and Colima are installed and running.
-- Builds and starts containers – runs docker compose up -d --build to build the image and launch the Spring Boot application in the background.
-- Runs approov-test.sh – executes all endpoint tests `unprotected (no headers)` `token-check (with Approov-Token)` `token-binding (with Approov-Token + Authorization header`
+- Builds and starts containers – runs `docker compose -f compose.yaml up -d --build app` to build the image and launch the Spring Boot application in the background.
+- Runs test.sh – executes all endpoint tests `unprotected (no headers)` `token-check (with Approov-Token)` `token-binding (with Approov-Token + Authorization header`
 - Displays results and stops containers when finished.
 
 </details>
@@ -293,10 +293,10 @@ Cache-Control: no-cache
 approov token -genExample example.com
 ```
 
-#### Use the generated token in the `Approov-Token` header and /token-check endpoint. 
+#### Use the generated token in the `Approov-Token` header and /token-check endpoint.
 ```bash
 curl -iX GET http://localhost:8080/token-check \
-     -H "Approov-Token: <valid_approov_token_here>"
+     -H "Approov-Token: valid_approov_token_here"
 ```
 
 The response will be a `200` for request:
@@ -331,8 +331,8 @@ approov token -setDataHashInToken your-custom-name -genExample example.com
 
 ```bash
 curl -iX GET http://localhost:8080/token-binding-1 \
-     -H "Approov-Token: <valid_approov_token_here>" \
-     -H "Authorization: <your-custom-name>"
+     -H "Approov-Token: valid_approov_token_here" \
+     -H "Authorization: your-custom-name"
 ```
 
 The response will be a `200` for request:
@@ -367,7 +367,7 @@ approov token -setDataHashInToken ExampleAuthToken==ContentDigest== -genExample 
 
 ```bash
 curl -iX GET http://localhost:8080/token-binding-2 \
-     -H "Approov-Token: <valid_approov_token_here>" \
+     -H "Approov-Token: valid_approov_token_here" \
      -H "Authorization: ExampleAuthToken==" \
      -H "Content-Digest: ContentDigest=="
 ```
