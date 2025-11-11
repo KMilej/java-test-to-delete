@@ -27,7 +27,7 @@ class ApproovTokenBindingAuthentication {
     boolean checkClaimMatchesFor(String tokenBindingHeader, Claims approovTokenPayloadClaims) {
         if (tokenBindingHeader == null) {
             throw new ApproovTokenBindingAuthenticationException(
-                    "The token binding header value is null.", HttpStatus.BAD_REQUEST.value());
+                    "The token binding header value is null.", HttpStatus.UNAUTHORIZED.value());
         }
 
         String expectedBinding = extractApproovTokenBindingClaim(approovTokenPayloadClaims);
@@ -53,13 +53,13 @@ class ApproovTokenBindingAuthentication {
         if (!approovTokenPayloadClaims.containsKey("pay")) {
             throw new ApproovTokenBindingAuthenticationException(
                     "The key `pay`, for the token binding, is missing in the Approov token payload.",
-                    HttpStatus.BAD_REQUEST.value());
+                    HttpStatus.UNAUTHORIZED.value());
         }
 
         Object claimValue = approovTokenPayloadClaims.get("pay");
         if (claimValue == null) {
             throw new ApproovTokenBindingAuthenticationException(
-                    "The token binding in the Approov token is null.", HttpStatus.BAD_REQUEST.value());
+                    "The token binding in the Approov token is null.", HttpStatus.UNAUTHORIZED.value());
         }
 
         String binding = claimValue.toString().trim();
@@ -68,7 +68,7 @@ class ApproovTokenBindingAuthentication {
         }
 
         throw new ApproovTokenBindingAuthenticationException(
-                "The token binding in the Approov token is empty.", HttpStatus.BAD_REQUEST.value());
+                "The token binding in the Approov token is empty.", HttpStatus.UNAUTHORIZED.value());
     }
 
     private String hashBase64Encoded(String value) {

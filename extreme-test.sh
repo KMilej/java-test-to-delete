@@ -28,7 +28,6 @@ else
   approov_disabled=true
 fi
 
-
 test_results=()
 run_test() {
   local name="$1"; shift
@@ -41,7 +40,7 @@ run_test() {
   echo "$name: $result  (status : $status, expected: $expected)"
   test_results+=("$name: $result")
   {
-    echo "===== $name ====="
+    echo " $name "
     echo "$resp"
     if [ "$approov_disabled" = true ]; then
       echo "Approov State: disabled, no checks performed."
@@ -72,7 +71,7 @@ skip_test() {
   echo "$name: Skipped"
   test_results+=("$name: Skipped")
   {
-    echo "===== $name ====="
+    echo " $name "
     echo "Skipped (token generation unavailable)."
     echo
   } >> "$LOGFILE" 2>&1
@@ -200,7 +199,6 @@ else
     "$BASE_URL/token-binding-2"
 fi
 
-
 # 4) Extreme-test all
 echo
 echo "== Extreme-test"
@@ -289,6 +287,100 @@ else
   skip_test "Extreme 4.4 (binding-2 token missing: approov_token_3_valid)"
 fi
 
+# 5) Bad tokens and binding tests
+
+# A) Bad token - bad signature
+if [ -f "$TOKDIR/approov_token_1_valid" ]; then
+  good_tok="$(cat "$TOKDIR/approov_token_1_valid")"
+  # Corrupt signature part (header.payload.bogussignature)
+  bad_sig_tok="$(echo "$good_tok" | awk -F. '{printf "%s.%s.%s", $1, $2, "bogussignature"}')"
+  exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+  run_test "Extreme 5.1 Bad token - bad signature" "$exp" \
+    -H "$HDR_NAME: $bad_sig_tok" \
+    "$BASE_URL/token-check"
+else
+  skip_test "Bad token - bad signature"
+fi
+
+# B) Bad token - invalid encoding (not a JWT)
+BAD_TOKEN_INVALID_ENCODING="eyJ0eXAiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIn0.eyJleHAiOjE5OTk5OTk5OTksImRpZCI6IkV4YW1wbGVBcHByb292VG9rZW5ESUQ9PSJ9.NwqfsaOUBfXaf8KxRZovYCy0c6hqy29g88z1LIgzuQY"
+exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+run_test "Extreme 5.2 Bad token - invalid encoding" "$exp" \
+  -H "$HDR_NAME: $BAD_TOKEN_INVALID_ENCODING" \
+  "$BASE_URL/token-check"
+
+# C) Bad token - no expiry 
+if [ -n "${BAD_TOKEN_NO_EXPIRY:-}" ]; then
+  exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+  run_test "5.3 Bad token - no expiry" "$exp" \
+    -H "$HDR_NAME: $BAD_TOKEN_NO_EXPIRY" \
+    "$BASE_URL/token-check"
+else
+  # Best-effort simulation (may be treated as bad sig on some servers)
+  if [ -f "$TOKDIR/approov_token_1_valid" ]; then
+    hdr_payload="$(cat "$TOKDIR/approov_token_1_valid" | cut -d. -f1-2)"
+    noexp_tok="${hdr_payload}.nosig"
+    run_test "Extreme 5.4 Bad token - no expiry (simulated)" "$exp" \
+      -H "$HDR_NAME: $noexp_tok" \
+      "$BASE_URL/token-check"
+  else
+    skip_test "Bad token - no expiry"
+  fi
+fi
+
+# D) Bad token - expired
+BAD_TOKEN_EXPIRED="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJleHAiOjE3NjIzNTg3OTcsImlwIjoiMS4yLjMuNCIsImRpZCI6IkV4YW1wbGVBcHByb292VG9rZW5ESUQ9PSJ9.vQZqzUAOkjdqDRWMjUYQFwkwFd9sRn1UjXyZCIymNcE"
+  exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+  run_test "Extreme 5.5 Bad token - expired" "$exp" \
+    -H "$HDR_NAME: $BAD_TOKEN_EXPIRED" \
+    "$BASE_URL/token-check"
+
+# E) Missing binding with good full token (headers present, token has no binding claim)
+if [ -f "$TOKDIR/approov_token_1_valid" ]; then
+  exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+  run_test "Extreme 5.6 Missing binding with good full token" "$exp" \
+    -H "Authorization: ExampleAuthToken==" \
+    -H "Content-Digest: ContentDigest==" \
+    -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_1_valid")" \
+    "$BASE_URL/token-binding-2"
+else
+  skip_test "Missing binding with good full token"
+fi
+
+# F) Missing authorization with valid token binding token (only Content-Digest present)
+if [ -f "$TOKDIR/approov_token_3_valid" ]; then
+  exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+  run_test "Extreme 5.7 Missing Authorization with valid binding token" "$exp" \
+    -H "Content-Digest: ContentDigest==" \
+    -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_3_valid")" \
+    "$BASE_URL/token-binding-2"
+else
+  skip_test "Missing Authorization with valid binding token"
+fi
+
+# G) Good full token with binding (Authorization + Content-Digest + correctly bound token)
+if [ -f "$TOKDIR/approov_token_3_valid" ]; then
+  run_test "Extreme 5.8 Good full token with binding" 200 \
+    -H "Authorization: ExampleAuthToken==" \
+    -H "Content-Digest: ContentDigest==" \
+    -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_3_valid")" \
+    "$BASE_URL/token-binding-2"
+else
+  skip_test "Good full token with binding"
+fi
+
+# H) Correctly signed but wrong binding (send bound token, wrong header content)
+if [ -f "$TOKDIR/approov_token_3_valid" ]; then
+  exp=$([ "$approov_disabled" = true ] && echo 200 || echo 401)
+  run_test "Extreme 5.9 Correctly signed but wrong binding" "$exp" \
+    -H "Authorization: WrongAuth==" \
+    -H "Content-Digest: WrongDigest==" \
+    -H "$HDR_NAME: $(cat "$TOKDIR/approov_token_3_valid")" \
+    "$BASE_URL/token-binding-2"
+else
+  skip_test "Correctly signed but wrong binding"
+fi
+
 # Summary statistics 
 total_tests=${#test_results[@]}
 passed_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Passed" || true)
@@ -297,8 +389,5 @@ skipped_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "Skipped" || true)
 echo
 echo "Summary: total=$total_tests | passed=$passed_tests | failed=$failed_tests | skipped=$skipped_tests"
 
-
 echo
 echo "Full request and response details are saved in: $LOGFILE"
-# echo "Summary:"
-# printf ' - %s\n' "${test_results[@]}"
