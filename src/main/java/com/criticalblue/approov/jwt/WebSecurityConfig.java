@@ -72,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                             "/approov/disable",
                             "/approov/toggle")
                     .permitAll()
+                    .antMatchers("/sfv_test").permitAll()
                     .antMatchers("/token-check").authenticated()
                     .antMatchers("/token-binding-1").authenticated()
                     .antMatchers("/token-binding-2").authenticated()

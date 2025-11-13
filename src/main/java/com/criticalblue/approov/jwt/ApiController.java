@@ -1,11 +1,19 @@
 package com.criticalblue.approov.jwt;
 
+import com.criticalblue.approov.jwt.sfv.SfvFormatter;
+import com.criticalblue.approov.jwt.sfv.SfvParseException;
+import com.criticalblue.approov.jwt.sfv.SfvParser;
+import com.criticalblue.approov.jwt.sfv.StructuredFieldValues.DictionaryEntry;
+import com.criticalblue.approov.jwt.sfv.StructuredFieldValues.SfvValue;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,10 +137,79 @@ public class ApiController {
         return ResponseEntity.ok(body);
     }
 
+    @GetMapping("/sfv_test")
+    public ResponseEntity<String> structuredFieldTest(
+            @RequestHeader(value = "sfvt", required = false) String typeHeader,
+            @RequestHeader(value = "sfv", required = false) List<String> sfvHeaderValues) {
+        String combinedValue = combineHeaderValues(sfvHeaderValues);
+        if (!hasText(typeHeader) || !hasText(combinedValue)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Missing sfv or sfvt header");
+        }
+
+        String upperType = typeHeader.trim().toUpperCase(Locale.ROOT);
+        try {
+            String serialized;
+            switch (upperType) {
+                case "ITEM":
+                    SfvValue value = SfvParser.parseItem(combinedValue);
+                    serialized = SfvFormatter.serializeItem(value);
+                    break;
+                case "LIST":
+                    List<SfvValue> list = SfvParser.parseList(combinedValue);
+                    serialized = SfvFormatter.serializeList(list);
+                    break;
+                case "DICTIONARY":
+                    LinkedHashMap<String, DictionaryEntry> dictionary =
+                            SfvParser.parseDictionary(combinedValue);
+                    serialized = SfvFormatter.serializeDictionary(dictionary);
+                    break;
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Unsupported sfvt value '" + upperType + "'");
+            }
+
+            if (!serialized.equals(combinedValue)) {
+                return structuredFieldFailure(
+                        String.format(
+                                "Serialized object does not match original: %s != %s",
+                                serialized,
+                                combinedValue));
+            }
+
+            return ResponseEntity.ok("SFV roundtrip OK");
+        } catch (SfvParseException ex) {
+            return structuredFieldFailure(ex.getMessage());
+        }
+    }
+
     private static Map<String, Object> simpleFlagResponse(String key, boolean value) {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put(key, value);
         return response;
+    }
+
+    private ResponseEntity<String> structuredFieldFailure(String message) {
+        LOGGER.debug("Structured field roundtrip failure - {}", message);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Failed SFV roundtrip");
+    }
+
+    private static String combineHeaderValues(List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        if (values.size() == 1) {
+            return values.get(0);
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            if (i > 0) {
+                builder.append(", ");
+            }
+            builder.append(values.get(i));
+        }
+        return builder.toString();
     }
 
     private static Map<String, Object> newStatePayload() {
