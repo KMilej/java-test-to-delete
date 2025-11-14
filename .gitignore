@@ -37,3 +37,4 @@ local.properties
 
 .config/
 openresty-server/
+.gitignore
