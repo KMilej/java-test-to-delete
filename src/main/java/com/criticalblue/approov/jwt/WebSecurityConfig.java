@@ -76,6 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/token-check").authenticated()
                     .antMatchers("/token-binding-1").authenticated()
                     .antMatchers("/token-binding-2").authenticated()
+                    .antMatchers("/token").authenticated()
                     .antMatchers("/message-signing-check").authenticated();
         }
     }

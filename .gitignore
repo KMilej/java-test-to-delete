@@ -36,3 +36,4 @@ local.properties
 .run/
 
 .config/
+openresty-server/

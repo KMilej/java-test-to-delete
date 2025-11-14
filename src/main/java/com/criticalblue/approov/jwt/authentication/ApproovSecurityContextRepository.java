@@ -22,7 +22,9 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
 
     @Override
     public SecurityContext loadContext(HttpRequestResponseHolder requestResponseHolder) {
-        HttpServletRequest request = requestResponseHolder.getRequest();
+        HttpServletRequest request =
+                ApproovMessageSigningValidator.ensureCachedRequest(requestResponseHolder.getRequest());
+        requestResponseHolder.setRequest(request);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
         if (!ApiController.isApproovEnabled()) {
@@ -62,13 +64,14 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
         switch (path) {
             case "/unprotected":
             case "/token-check":
-                return new ApproovAuthentication(approovToken, null, false);
+            case "/token":
+                return new ApproovAuthentication(request, approovToken, null, false);
             case "/token-binding-1":
                 return new ApproovAuthentication(
-                        approovToken, getSingleBindingValue(request), true);
+                        request, approovToken, getSingleBindingValue(request), true);
             case "/token-binding-2":
                 return new ApproovAuthentication(
-                        approovToken, getCombinedBindingValue(request), true);
+                        request, approovToken, getCombinedBindingValue(request), true);
             default:
                 return buildAuthenticationForDefaultPath(request, approovToken);
         }
@@ -78,11 +81,11 @@ public class ApproovSecurityContextRepository implements SecurityContextReposito
             HttpServletRequest request, String approovToken) {
         boolean enforceBinding = ApiController.isTokenBindingEnabled();
         if (!enforceBinding) {
-            return new ApproovAuthentication(approovToken, null, false);
+            return new ApproovAuthentication(request, approovToken, null, false);
         }
 
         return new ApproovAuthentication(
-                approovToken, getSingleBindingValue(request), true);
+                request, approovToken, getSingleBindingValue(request), true);
     }
 
     private Authentication disabledAuthentication() {

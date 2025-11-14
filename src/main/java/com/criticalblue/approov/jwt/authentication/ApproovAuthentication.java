@@ -2,6 +2,7 @@ package com.criticalblue.approov.jwt.authentication;
 
 import java.util.Collection;
 import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -16,11 +17,14 @@ import org.springframework.security.core.GrantedAuthority;
 public class ApproovAuthentication implements ApproovJwtAuthentication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApproovAuthentication.class);
+    private static final ApproovMessageSigningValidator MESSAGE_SIGNING_VALIDATOR =
+            new ApproovMessageSigningValidator();
 
     private final ApproovTokenBindingAuthentication tokenBindingValidator =
             new ApproovTokenBindingAuthentication();
     private final String tokenBindingHeader;
     private final boolean enforceBinding;
+    private final HttpServletRequest request;
 
     private Claims approovTokenPayloadClaims;
     private String approovToken;
@@ -30,14 +34,19 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
     @Deprecated(forRemoval = false)
     public ApproovAuthentication(
             ApproovConfig approovConfig,
+            HttpServletRequest request,
             String approovToken,
             String tokenBindingHeader,
             boolean enforceBinding) {
-        this(approovToken, tokenBindingHeader, enforceBinding);
+        this(request, approovToken, tokenBindingHeader, enforceBinding);
     }
 
     public ApproovAuthentication(
-            String approovToken, String tokenBindingHeader, boolean enforceBinding) {
+            HttpServletRequest request,
+            String approovToken,
+            String tokenBindingHeader,
+            boolean enforceBinding) {
+        this.request = request;
         this.approovToken = approovToken;
         this.tokenBindingHeader = tokenBindingHeader;
         this.enforceBinding = enforceBinding;
@@ -62,6 +71,7 @@ public class ApproovAuthentication implements ApproovJwtAuthentication {
             validTokenBinding = true;
         }
 
+        MESSAGE_SIGNING_VALIDATOR.verifyIfPresent(request, approovTokenPayloadClaims);
         authenticated = true;
     }
 
