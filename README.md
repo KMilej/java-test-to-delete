@@ -1,60 +1,6 @@
 # Approov Quickstart - Java Spring Token Check
 
-<details>
-  <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
-    <img src="https://approov.io/hs-fs/hubfs/approov%20logo%20300ppi-1.webp?height=80&width=164&name=approov+logo+300ppi-1.webp"
-         width="40"
-         style="background-color:white; padding:4px; border-radius:6px; margin-right:10px;"
-         alt="Approov logo" />
-    <strong>Click “Approov Overview” for more details</strong>
-  </summary>
-
----
-<b>[**Approov**](https://approov.io) is an API security solution that verifies whether requests received by your backend services originate from **trusted versions** of your mobile apps.</b>
-
-### Why Approov?
-
-You can learn more about Approov, the motives for adopting it, and more detail on how it works by following this [link](https://approov.io/product). In brief, Approov:
-
----
-- Ensures that accesses to your API come only from **official app versions**, blocking republished, modified, or tampered ones
-- Protects **sensitive backend data** by preventing API abuse from bots or scripts
-- Secures the communication channel between your app and API using [Approov Dynamic Certificate Pinning](https://approov.io/docs/latest/approov-usage-documentation/#approov-dynamic-pinning), which provides the benefits of traditional pinning without its maintenance drawbacks
-- Removes the need for **API keys** embedded in mobile apps
-- Provides **DoS protection**, mitigating attacks that attempt to exhaust API server resources or degrade service for legitimate users
-
-### How It Works
-
----
-The following is a high-level overview of how the **Approov Cloud Service** and the **backend server** operate together from a backend perspective.  
-For a full explanation of how the mobile app, backend, and Approov SDK interact, see the [Approov overview page](https://approov.io/product).
-
-### Approov Cloud Service
-
-The Approov Cloud Service attests that a device is running a legitimate and untampered version of your mobile app.
-
-- If the integrity check **passes**, a **valid token** is returned to the app
-- If the integrity check **fails**, a **legitimate-looking (invalid) token** is returned
-
-In either case, the app, unaware of the token's validity, adds it to every request it makes to the Approov protected API(s).
-
-### Backend Server
-
-The backend server verifies that the token supplied in the `Approov-Token` header is both present and valid.  
-Validation is performed using a **shared secret** known only to the Approov Cloud Service and your backend.
-
-The request flow:
-
-- If the Approov Token is **valid**, the request is processed by the API endpoint
-- If the Approov Token is **invalid**, the server returns **HTTP 401 Unauthorized**
-
-> You can choose to log JWT verification failures, but we left it out on purpose so that you can have the choice of how you prefer to do it and decide the right amount of information you want to log. 
----
-
-</details>
-
----
-This `quickstart` implements the [Approov](https://approov.io) server-side request verification code using the Java Spring Boot Framework.
+#### This `quickstart` implements the [Approov](https://approov.io) server-side request verification code using the Java Spring Boot Framework.
 
 Approov provides comprehensive [runtime application self protection](https://approov.io/mobile-app-security/rasp) delivering app attestation, dynamic certificate pinning, runtime secrets protection, and API shielding - all unified across Android, iOS, and HarmonyOS.
 
@@ -75,11 +21,10 @@ It provides a simple example API `example.com` that performs Approov token verif
 
 ---
 
-### Requirements
-#### Before you start, If you are new to Approov, make sure you have the following:
-* Approov CLI initialized [Follow the Approov CLI initialization guide](https://ext.approov.io/docs/latest/approov-installation/#initializing-the-approov-cli).
-* [Sign up for the Approov Free Trial](https://approov.io/signup)(no credit card needed)
+### Requirements:
 
+* **_[Follow the Approov CLI initialization guide](https://ext.approov.io/docs/latest/approov-installation/#initializing-the-approov-cli)._**
+* **_[Sign up for the Approov Free Trial](https://approov.io/signup) (no credit card needed)._**
 
 ### Approov Token Verification Flow (Short Version)
 
@@ -97,19 +42,15 @@ It provides a simple example API `example.com` that performs Approov token verif
     - Other claims if configured
 
 4. [(Optional) Token Binding:](https://ext.approov.io/docs/latest/approov-usage-documentation/#token-binding)
-   - For extra protection, the app may include an additional `Approov-Token-Binding` header.  
-   - This binds the token to specific request data (for example, an access token or session ID).  
-   - The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
+    - For extra protection, the app may include an additional `Approov-Token-Binding` header.
+    - This binds the token to specific request data (for example, an access token or session ID).
+    - The server ensures that this value matches the hash inside the token, preventing **token reuse or replay attacks**.
 
 5. **Request Decision:**
     -  If all checks pass → the request is trusted and processed **`200 OK`**.
     -  If validation fails → the server responds with **`401 Unauthorized`**.
 
-```json
-"Try it yourself by following the steps below with any of the available options"
-```
-
----
+#### _"Try it yourself by following the steps below with any of the available options"_
 
 <details>
 <summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
@@ -120,6 +61,7 @@ It provides a simple example API `example.com` that performs Approov token verif
 ## Requirements
 
 ```test
+
 Docker Environment:
 - Docker: 28.5.1+
 - Docker Compose: v2.40.2+ 
@@ -147,7 +89,6 @@ bash set-secret-api.sh
 ```
 
 If you have all requirements installed, you can build and run the example inside `quickstart-java-spring-token-check`:
-
 ```bash
 bash run-server.sh
 ```
@@ -176,22 +117,24 @@ This script will:
 * Approov CLI initialized
 ```
 
-#### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
 #### inside the project folder `quickstart-java-spring-token-check`, run:
 
+#### Build the project:
 ```bash
 ./gradlew build
 ```
 
-#### Environment Setup Script — `set-approov-secret.sh`
+#### Environment Setup Script - `set-approov-secret.sh`
 ```bash
 bash set-secret-api.sh
 ```
 
-What is does:
+This script will:
 - Creates the `.env` file automatically if `.env does not exist, the script copies it from `.env.example`.
 - Run `approov secret -get base64` to retrieve the Approov secret from the Approov CLI and sets it in the `.env` file.
 - Registers the domain example.com in the Approov cloud configuration so it can be protected by Approov.
+
+#### Run the server:
 ```bash
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
@@ -205,9 +148,9 @@ bash test.sh
 ```
 
 This script will:
-- Checks Approov authentication and required tools — verifies that approov and curl are available, and confirms Approov CLI login works.
-- tests Approov state and setup — calls /approov-state to detect whether token checking is enabled or disabled.
-- Runs endpoint tests — performs HTTP requests for: `/unprotected (no token), /token-check (valid/invalid tokens), /token-binding-1 and /token-binding-2 (with bound headers like Authorization and Content-Digest).`
+- Checks Approov authentication and required tools - verifies that approov and curl are available, and confirms Approov CLI login works.
+- tests Approov state and setup - calls /approov-state to detect whether token checking is enabled or disabled.
+- Runs endpoint tests - performs HTTP requests for: `/unprotected (no token), /token-check (valid/invalid tokens), /token-binding-1 and /token-binding-2 (request is sent with bound headers: Authorization and Content-Digest).`
 
 </details>
 
@@ -227,9 +170,9 @@ This script will:
 * Approov CLI initialized
 ```
 
-#### Now, open your IDE (IntelliJ, Eclipse, Android Studio, etc.) and import the project as a Gradle project.
 #### inside the project folder `quickstart-java-spring-token-check`, run:
 
+#### Build the project:
 ```bash
 ./gradlew build
 ```
@@ -247,16 +190,14 @@ approov secret -get base64
 approov api -add example.com
 ```
 
-#### Finally, run the Spring Boot application with:
+#### Run the server:
 ```bash
 set -a  # auto-export all assignments
 source .env && ./gradlew bootRun
 set +a  # stop exporting variables
 ```
 
-### ===========================================================
-### 1. Unprotected Endpoint (No Approov)
-### ===========================================================
+## *1. Unprotected Endpoint (No Approov)*
 
 - The client sends a normal HTTPS request.
 - The server **does not verify** any Approov token or extra authentication header.
@@ -274,9 +215,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 ```
 
-### ===========================================================
-### 2. Approov Token check
-### ===========================================================
+## *2. Approov Token Check*
 
 - The client includes an **`Approov-Token`** (a short-lived JWT) in each API request header.
 - The server verifies this token using the ** Approov secret key** that is securely configured on the backend and checks:
@@ -309,15 +248,13 @@ Cache-Control: no-cache
 
 #### If you use an invalid or missing token, the server will respond with `401 Unauthorized`.
 
-### ===========================================================
-### 3. Approov Token Binding check
-### ===========================================================
+## *3. Approov Token Binding Check*
 
 - The client sends two headers on authenticated API calls:
     - **`Approov-Token`**
     - **`Authorization`** header containing a hash of specific request data (e.g., access token or session ID).
 - The server verifies the token **and** ensures that the bound value matches what the app used.
-- Prevents token replay — the Approov token **cannot be reused or stolen** for another session.
+- Prevents token replay - the Approov token **cannot be reused or stolen** for another session.
 - **Use case:** stronger protection for **authenticated API calls** tied to a specific user or device.
 
 #### The following example shows how the API responds when an Approov token with binding is required.
@@ -343,11 +280,9 @@ Content-Type: application/json
 Cache-Control: no-cache
 ```
 
-#### If you use an invalid or missing header or token, the server will respond with `401 Unauthorized`. 
+#### If you use an invalid or missing header or token, the server will respond with `401 Unauthorized`.
 
-### ===========================================================
-### 3. Approov Token Binding check with two different bound values
-### ===========================================================
+## *4. Approov Token Binding Check with Two Different Bound Values*
 
 - The client sends three headers on authenticated API calls:
     - **`Approov-Token`**
@@ -356,7 +291,7 @@ Cache-Control: no-cache
 - Both are included in the hash inside the Approov token. This means the server verifies a single hash that covers both authentication credentials.
 - **Use case:** This configuration provides the highest level of protection for authenticated API requests:
 
-#### The following example shows how the API responds when an Approov token with two bindings is required.
+### <em>The following example shows how the API responds when an Approov token with two bindings is required.</em>
 
 #### Generate a valid Approov Token with two binding:
 ```bash
@@ -386,6 +321,107 @@ Cache-Control: no-cache
 
 ---
 
+<details>
+<summary style="font-size:1.6em; line-height:1.6; display:flex; align-items:center;">
+  <img src="https://img.shields.io/badge/IDE-gray?style=for-the-badge&logoColor=white" width="40" style="vertical-align:middle; margin-right:10px;" />
+ <strong>HTTP Message Signing </strong>
+</summary>
+
+---
+### Message signing protects against tampering and replay by requiring each request to carry an [HTTP message signature](https://ext.approov.io/docs/latest/approov-usage-documentation/#installation-message-signing) generated on the device. 
+
+#### This guide explains how the Java Spring quickstart verifies those signatures using the installation public key (ipk) delivered inside the token.
+
+*_The ipk_message_sign_test endpoint is the one used to construct a message signature that is then fed back into the server in the token or token_binding endpoint for verification. It is used by msg-test.sh to build the request properties for checking the message signing flow._*
+
+#### Add or change secret on .env file for:
+##### `APPROOV_BASE64_SECRET=TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/TEST+SECRET/AA==`
+
+#### Build the project:
+```bash
+./gradlew build
+```
+
+#### Run the server:
+```bash
+set -a  # auto-export all assignments
+source .env && ./gradlew bootRun
+set +a  # stop exporting variables
+```
+
+If you changed the secret in the .env file, you can run the Bash script located in the `quickstart-java-spring-token-check` path
+
+```bash
+bash msg-test.sh
+```
+
+This script will do four tests to verify the message signing flow:
+- *Test 1* checks that a signed GET including only the HTTP method and approov-token is accepted.
+- *Test 2* adds the canonical request URI to the signature to confirm URI binding works for GET.
+- *Test 3* switches to POST, includes the body hash as a string content-digest, and ensures the server validates it.
+- *Test 4* repeats the POST but encodes content-digest as a byte sequence to verify that format also passes.
+
+#### To reproduce the manual message-signing check without bash script:
+
+### Test 1: GET with token and signature
+
+```bash
+export GOOD_IPK_TOKEN='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhcHByb292LmlvIiwiZXhwIjoxOTk5OTk5OTk5LCJpYXQiOjE3MDAwMDAwMDAsImlzcyI6IkFwcHJvb3ZBY2NvdW50SUQuYXBwcm9vdi5pbyIsInN1YiI6ImFwcHJvb3Z8RXhhbXBsZUFwcHJvb3ZUb2tlbkRJRD09IiwiaXAiOiIxLjIuMy40IiwiaXBrIjoiTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFSlNtNERNY2l2QXd2aE0rS05jZTJDL1gyNmNqM29HeVV3V1ZVUHVOdVpIdGQycXlWc00rMGc3cVg3M1FoME9mNmZuMTBBQXBMbmw4dlJRc3Z4OTRmWlE9PSIsImRpZCI6IkV4YW1wbGVBcHByb292VG9rZW5ESUQ9PSJ9.hV6xTkGsp9uWwrD-yKkIGTBJawbofJEsuRLw9Qa5YXY'
+# A valid Approov token for testing the signature verification
+
+export TEST_PRIVATE_KEY='MHcCAQEEIHWZ2Ueq6odQNG+aaYmEbp7C6nujYNGr7nYKK2jqQ2asoAoGCCqGSM49AwEHoUQDQgAEJSm4DMcivAwvhM+KNce2C/X26cj3oGyUwWVUPuNuZHtd2qyVsM+0g7qX73Qh0Of6fn10AApLnl8vRQsvx94fZQ=='
+# DER-encoded EC P-256 private key used to generate the signature
+
+TEST1_TARGET_URI="http://0.0.0.0:8080/token?param1=value1&param2=value2"
+# The endpoint that will receive the signed request
+
+TEST1_SIGNATURE_INPUT='("@method" "approov-token");alg="ecdsa-p256-sha256";created=1744292750;expires=1999999999'
+# Structured fields included in the signature + algorithm + timestamps
+
+TEST1_MESSAGE="$(cat <<EOF
+"@method": GET
+"approov-token": $GOOD_IPK_TOKEN
+"@signature-params": ("@method" "approov-token");alg="ecdsa-p256-sha256";created=1744292750;expires=1999999999
+EOF
+)"
+# Canonical message built exactly the way the server reconstructs it
+# This MUST match the backend reconstruction for signature verification to work
+
+TEST1_MESSAGE_B64=$(printf '%s' "$TEST1_MESSAGE" | base64 | tr -d '\n')
+# Canonical message must be Base64-encoded before being signed
+
+TEST1_SIG=$(curl -sS \
+  -H "private-key: ${TEST_PRIVATE_KEY}" \
+  -H "msg: ${TEST1_MESSAGE_B64}" \
+  "http://0.0.0.0:8080/ipk_message_sign_test")
+# The demo server signs the message using your private key
+# The returned value is the detached ECDSA-P256 signature
+
+curl -sS -i \
+  -H "approov-token: ${GOOD_IPK_TOKEN}" \
+  -H "signature: install=:${TEST1_SIG}:" \
+  -H 'signature-input: install=("@method" "approov-token");alg="ecdsa-p256-sha256";created=1744292750;expires=1999999999' \
+  "http://0.0.0.0:8080/token?param1=value1&param2=value2"
+# Final request:
+# - Includes the Approov token
+# - Includes the signature
+# - Includes the signature-input description
+unset GOOD_IPK_TOKEN TEST_PRIVATE_KEY
+
+```
+***_If everything matches, the response will be a `200` for request:_***
+
+```text
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+```
+
+</details>
+
+---
+
 ### Disable or enable the approov service
 
 The quickstart can be enabled/disabled by running the following commands:
@@ -395,7 +431,7 @@ curl -X POST http://localhost:8080/approov/disable    # disable the approov serv
 
 curl -X POST http://localhost:8080/approov/enable     # enable the approov service
 
-curl -X GET http://localhost:8080/approov-state      # check current state
+curl -X GET http://localhost:8080/approov-state       # check current state
 ```
 
 #### You can rerun the tests with Approov disabled to observe how the application behaves when the Approov service is `no longer active`.
