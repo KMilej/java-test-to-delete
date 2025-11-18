@@ -37,4 +37,4 @@ local.properties
 
 .config/
 openresty-server/
-.gitignore
+.msg-signing-logs/
